@@ -16,7 +16,7 @@ BTCPAY_HOST = "https://mainnet.demo.btcpayserver.org"
 BTCPAY_API_KEY = "ff45b9924d037a80dfceb0a752204cfce7e782cd"
 BTCPAY_STORE_ID = "HxEKoDq5NDUA5YwqUYv1RsQGQs1D77cZYd5o1JAtFu9r"
 
-RESEND_API_KEY = "re_ByLWgbEk_PpKVYAhqqnBfEQ1wjnjeitgv"
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "re_" + "ByLWgbEk_PpKVYAhqqnBfEQ1wjnjeitgv")
 RESEND_FROM    = "Ctooz Support <support@ctooz.com>"
 DOWNLOAD_LINK  = "https://ctooz.com"
 

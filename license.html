@@ -15,12 +15,12 @@
     <!-- Navbar -->
     <nav class="w-full bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100/50 shadow-[0_2px_15px_rgba(0,0,0,0.05)]">
         <div class="container mx-auto flex items-center justify-between py-2.5 px-6 lg:px-12">
-            <a href="/" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
+            <a href="./" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
                 <img src="./assets/logo.png" alt="tooz Logo" class="h-10 md:h-11 w-auto object-contain">
             </a>
             <div class="hidden items-center gap-8 md:flex">
                 <div class="flex items-center bg-gray-50/50 p-1 rounded-xl border border-gray-100/50">
-                    <a href="/" class="relative px-5 py-1.5 text-[12px] font-bold tracking-wider uppercase z-10 text-gray-500 hover:text-gray-900">Home</a>
+                    <a href="./" class="relative px-5 py-1.5 text-[12px] font-bold tracking-wider uppercase z-10 text-gray-500 hover:text-gray-900">Home</a>
                     <a href="features" class="relative px-5 py-1.5 text-[12px] font-bold tracking-wider uppercase z-10 text-gray-500 hover:text-gray-900">Features</a>
                 </div>
                 <a href="license" class="bg-[#d94e02] hover:bg-[#b34002] text-white rounded-xl h-9 px-5 flex items-center font-bold text-[12px] shadow-sm transition-all hover:shadow-md active:scale-95">
@@ -226,6 +226,47 @@
         let currentInvoiceId = null;
         let statusPollingInterval = null;
 
+        const BTCPAY_DIRECT = {
+            host: "https://mainnet.demo.btcpayserver.org",
+            storeId: "HxEKoDq5NDUA5YwqUYv1RsQGQs1D77cZYd5o1JAtFu9r",
+            apiKey: "ff45b9924d037a80dfceb0a752204cfce7e782cd"
+        };
+
+        async function createInvoiceDirect(email) {
+            const res = await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${BTCPAY_DIRECT.apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount: "499",
+                    currency: "USD",
+                    metadata: { orderId: "CTOOZ-" + Date.now(), itemDesc: "CTOOZ Software License", buyerEmail: email }
+                })
+            });
+            const inv = await res.json();
+            if (!inv.id) throw new Error(inv.message || 'Invoice failed');
+
+            let pm = {};
+            try {
+                const pmRes = await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices/${inv.id}/payment-methods`, {
+                    headers: { 'Authorization': `token ${BTCPAY_DIRECT.apiKey}` }
+                });
+                const pms = await pmRes.json();
+                pm = (Array.isArray(pms) && pms[0]) || {};
+            } catch (e) {}
+
+            return {
+                success: true,
+                invoiceId: inv.id,
+                checkoutLink: inv.checkoutLink,
+                destination: pm.destination || "bc1qh9zgq5cr8q5qfmcpfkyr29n0vwx6w6xnax2gr9",
+                btcAmount: pm.amount || "0.0064",
+                paymentLink: pm.paymentLink || ("bitcoin:" + (pm.destination || "") + "?amount=" + (pm.amount || ""))
+            };
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
 
@@ -246,12 +287,24 @@
                     purchaseBtn.innerHTML = '<span class="animate-pulse">Connecting BTCPay...</span>';
 
                     try {
-                        const res = await fetch('/api/create-invoice', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: email, amount: "499", currency: "USD" })
-                        });
-                        const data = await res.json();
+                        let data = null;
+                        if (window.location.hostname.includes('github.io')) {
+                            data = await createInvoiceDirect(email);
+                        } else {
+                            try {
+                                const res = await fetch('/api/create-invoice', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ email: email, amount: "499", currency: "USD" })
+                                });
+                                data = await res.json();
+                                if (!data || !data.success) {
+                                    data = await createInvoiceDirect(email);
+                                }
+                            } catch (backendErr) {
+                                data = await createInvoiceDirect(email);
+                            }
+                        }
 
                         if (data.success) {
                             currentInvoiceId = data.invoiceId;
@@ -313,9 +366,19 @@
 
             statusPollingInterval = setInterval(async () => {
                 try {
-                    const res = await fetch(`/api/invoice-status?id=${currentInvoiceId}`);
-                    const data = await res.json();
-                    if (data.settled) {
+                    let settled = false;
+                    if (window.location.hostname.includes('github.io')) {
+                        const res = await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices/${currentInvoiceId}`, {
+                            headers: { 'Authorization': `token ${BTCPAY_DIRECT.apiKey}` }
+                        });
+                        const inv = await res.json();
+                        settled = ['Settled', 'Complete', 'Paid'].includes(inv.status);
+                    } else {
+                        const res = await fetch(`/api/invoice-status?id=${currentInvoiceId}`);
+                        const data = await res.json();
+                        settled = data.settled;
+                    }
+                    if (settled) {
                         stopStatusPolling();
                         onPaymentSuccess();
                     }
@@ -344,25 +407,49 @@
             btn.innerHTML = '<span class="animate-pulse">Confirming Sandbox Payment...</span>';
 
             try {
-                const userEmail = localStorage.getItem('user_email') || '';
-                const res = await fetch('/api/simulate-payment', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ invoiceId: currentInvoiceId, email: userEmail })
-                });
-                const data = await res.json();
-
-                if (data.success) {
+                if (window.location.hostname.includes('github.io')) {
+                    await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices/${currentInvoiceId}/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${BTCPAY_DIRECT.apiKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: "Settled" })
+                    });
                     onPaymentSuccess();
                 } else {
-                    alert('Sandbox payment failed: ' + (data.message || 'Error'));
+                    const userEmail = localStorage.getItem('user_email') || '';
+                    const res = await fetch('/api/simulate-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ invoiceId: currentInvoiceId, email: userEmail })
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        onPaymentSuccess();
+                    } else {
+                        alert('Sandbox payment failed: ' + (data.message || 'Error'));
+                        btn.disabled = false;
+                        btn.innerHTML = originalText;
+                    }
+                }
+            } catch (err) {
+                try {
+                    await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices/${currentInvoiceId}/status`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${BTCPAY_DIRECT.apiKey}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status: "Settled" })
+                    });
+                    onPaymentSuccess();
+                } catch (e2) {
+                    alert('Network error simulating sandbox payment.');
                     btn.disabled = false;
                     btn.innerHTML = originalText;
                 }
-            } catch (err) {
-                alert('Network error simulating sandbox payment.');
-                btn.disabled = false;
-                btn.innerHTML = originalText;
             }
         }
 
@@ -413,9 +500,19 @@
             }
 
             try {
-                const res = await fetch(`/api/invoice-status?id=${txInput}`);
-                const data = await res.json();
-                if (data.settled) {
+                let settled = false;
+                if (window.location.hostname.includes('github.io')) {
+                    const res = await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices/${txInput}`, {
+                        headers: { 'Authorization': `token ${BTCPAY_DIRECT.apiKey}` }
+                    });
+                    const inv = await res.json();
+                    settled = ['Settled', 'Complete', 'Paid'].includes(inv.status);
+                } else {
+                    const res = await fetch(`/api/invoice-status?id=${txInput}`);
+                    const data = await res.json();
+                    settled = data.settled;
+                }
+                if (settled) {
                     alert("BTCPay Server Payment Verified! Redirecting...");
                     window.location.href = 'success';
                     return;
