@@ -3,10 +3,10 @@ RewriteEngine On
 RewriteBase /
 
 # Block sensitive files
-<Files "invoices_data.json">
+<FilesMatch "\.(db|sql|json|lock)$">
     Order Allow,Deny
     Deny from all
-</Files>
+</FilesMatch>
 
 # 1. Route /api/* requests to api.php
 RewriteRule ^api/create-invoice$ api.php?action=create-invoice [QSA,L]

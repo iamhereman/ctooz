@@ -172,50 +172,47 @@
         </div>
     </footer>
 
-    <!-- BITCOIN PAYMENT MODAL -->
+    <!-- NATIVE BITCOIN PAYMENT MODAL -->
     <div id="payment-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeModal()"></div>
-        <div class="relative w-full max-w-[360px] bg-white rounded-[32px] overflow-hidden shadow-2xl flex flex-col p-6 text-center space-y-4">
+        <div class="relative w-full max-w-[380px] bg-white rounded-[32px] overflow-hidden shadow-2xl flex flex-col p-6 text-center space-y-4">
             
             <div id="modal-header" class="space-y-1">
                 <h2 class="text-lg font-black text-slate-900 uppercase">Pay $499 via Bitcoin</h2>
-                <div id="btc-amount-badge" class="hidden text-[10px] font-mono font-black text-[#D9540D] bg-orange-50 py-0.5 px-2.5 rounded-full mx-auto w-fit border border-orange-100"></div>
-                <p class="text-[9px] text-slate-500 font-bold uppercase">BTCPay Server Automated Checkout</p>
-            </div>
-
-            <!-- BTC QR & Address Section -->
-            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
-                <!-- Dynamic BTC QR Code -->
-                <img id="btc-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bitcoin:bc1qh9zgq5cr8q5qfmcpfkyr29n0vwx6w6xnax2gr9" alt="BTC QR" class="w-36 h-36 rounded-xl border bg-white p-1">
-                
-                <div class="w-full text-left space-y-1">
-                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">BTC Wallet Address (BTCPay):</span>
-                    <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-[10px] font-mono break-all text-slate-800 flex justify-between items-center cursor-pointer" onclick="copyAddr()">
-                        <span id="btc-addr">bc1qh9zgq5cr8q5qfmcpfkyr29n0vwx6w6xnax2gr9</span>
-                        <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1"></i>
-                    </div>
+                <div id="btc-amount-badge" class="hidden text-[11px] font-mono font-black text-[#D9540D] bg-orange-50 py-1 px-3 rounded-full mx-auto w-fit border border-orange-100"></div>
+                <div class="flex items-center justify-center gap-2 text-[10px] text-slate-500 font-bold uppercase">
+                    <span>Non-Custodial Direct Payment</span>
+                    <span>•</span>
+                    <span id="countdown-timer" class="text-red-500 font-mono">15:00</span>
                 </div>
             </div>
 
-            <!-- BTCPay Server Actions -->
-            <div class="space-y-2">
-                <!-- Sandbox Payment Button -->
-                <button id="sandbox-pay-btn" onclick="simulateSandboxPayment()" class="w-full h-10 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl uppercase transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer">
-                    <i data-lucide="zap" class="w-4 h-4"></i>
-                    <span>Simulate Sandbox Payment</span>
-                </button>
+            <!-- BTC QR & Address Section -->
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col items-center gap-2.5">
+                <!-- Dynamic BTC QR Code -->
+                <img id="btc-qr" src="" alt="BTC QR" class="w-40 h-40 rounded-xl border bg-white p-1.5 shadow-sm">
+                
+                <div class="w-full text-left space-y-1">
+                    <div class="flex justify-between items-center text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                        <span>Native Segwit Address:</span>
+                        <span id="derivation-badge" class="text-slate-500 font-mono"></span>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-[10px] font-mono break-all text-slate-800 flex justify-between items-center cursor-pointer hover:border-orange-300 transition-colors" onclick="copyAddr()">
+                        <span id="btc-addr">Loading address...</span>
+                        <i data-lucide="copy" class="w-4 h-4 text-slate-400 shrink-0 ml-1.5"></i>
+                    </div>
+                </div>
 
-                <!-- External BTCPay Full Checkout Link -->
-                <a id="btcpay-checkout-link" href="#" target="_blank" class="w-full h-9 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold rounded-xl uppercase transition-all flex items-center justify-center gap-1.5">
-                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
-                    <span>Open BTCPay Full Checkout</span>
+                <a id="wallet-pay-link" href="#" class="w-full h-9 bg-slate-900 hover:bg-black text-white text-[11px] font-bold rounded-xl uppercase transition-all flex items-center justify-center gap-1.5">
+                    <i data-lucide="wallet" class="w-3.5 h-3.5"></i>
+                    <span>Open in Bitcoin Wallet</span>
                 </a>
             </div>
 
             <!-- Real-time Status -->
-            <div id="payment-status-box" class="text-[9px] font-bold text-slate-400 flex items-center justify-center gap-1.5">
-                <span id="status-indicator" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse inline-block"></span>
-                <span id="payment-status-text">Awaiting Bitcoin Transaction...</span>
+            <div id="payment-status-box" class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-[10px] font-bold text-slate-600 flex items-center justify-center gap-2">
+                <span id="status-indicator" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse inline-block"></span>
+                <span id="payment-status-text">Listening for transaction on Bitcoin network...</span>
             </div>
 
             <button onclick="closeModal()" class="text-[9px] font-black text-slate-400 hover:text-slate-800 uppercase tracking-widest">Cancel</button>
@@ -223,49 +220,11 @@
     </div>
 
     <script>
-        let currentInvoiceId = null;
+        let currentOrderId = null;
+        let currentBtcAddress = null;
         let statusPollingInterval = null;
-
-        const BTCPAY_DIRECT = {
-            host: "https://mainnet.demo.btcpayserver.org",
-            storeId: "HxEKoDq5NDUA5YwqUYv1RsQGQs1D77cZYd5o1JAtFu9r",
-            apiKey: "ff45b9924d037a80dfceb0a752204cfce7e782cd"
-        };
-
-        async function createInvoiceDirect(email) {
-            const res = await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `token ${BTCPAY_DIRECT.apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    amount: "499",
-                    currency: "USD",
-                    metadata: { orderId: "CTOOZ-" + Date.now(), itemDesc: "CTOOZ Software License", buyerEmail: email }
-                })
-            });
-            const inv = await res.json();
-            if (!inv.id) throw new Error(inv.message || 'Invoice failed');
-
-            let pm = {};
-            try {
-                const pmRes = await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices/${inv.id}/payment-methods`, {
-                    headers: { 'Authorization': `token ${BTCPAY_DIRECT.apiKey}` }
-                });
-                const pms = await pmRes.json();
-                pm = (Array.isArray(pms) && pms[0]) || {};
-            } catch (e) {}
-
-            return {
-                success: true,
-                invoiceId: inv.id,
-                checkoutLink: inv.checkoutLink,
-                destination: pm.destination || "bc1qh9zgq5cr8q5qfmcpfkyr29n0vwx6w6xnax2gr9",
-                btcAmount: pm.amount || "0.0064",
-                paymentLink: pm.paymentLink || ("bitcoin:" + (pm.destination || "") + "?amount=" + (pm.amount || ""))
-            };
-        }
+        let countdownInterval = null;
+        let expiryTimestamp = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -284,56 +243,45 @@
                     
                     const originalText = purchaseBtn.innerHTML;
                     purchaseBtn.disabled = true;
-                    purchaseBtn.innerHTML = '<span class="animate-pulse">Connecting BTCPay...</span>';
+                    purchaseBtn.innerHTML = '<span class="animate-pulse">Generating Bitcoin Invoice...</span>';
 
                     try {
-                        let data = null;
-                        if (window.location.hostname.includes('github.io')) {
-                            data = await createInvoiceDirect(email);
-                        } else {
-                            try {
-                                const res = await fetch('/api/create-invoice', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({ email: email, amount: "499", currency: "USD" })
-                                });
-                                data = await res.json();
-                                if (!data || !data.success) {
-                                    data = await createInvoiceDirect(email);
-                                }
-                            } catch (backendErr) {
-                                data = await createInvoiceDirect(email);
-                            }
-                        }
+                        const res = await fetch('/checkout.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: email, amount: 499 })
+                        });
+                        const data = await res.json();
 
                         if (data.success) {
-                            currentInvoiceId = data.invoiceId;
+                            currentOrderId = data.orderId;
+                            currentBtcAddress = data.address;
+
+                            document.getElementById('btc-addr').innerText = data.address;
+                            const badge = document.getElementById('btc-amount-badge');
+                            badge.innerText = `${data.btcAmount} BTC (${data.sats.toLocaleString()} Sats)`;
+                            badge.classList.remove('hidden');
+
+                            document.getElementById('btc-qr').src = data.qrCodeUrl || ('https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(data.paymentLink));
+                            document.getElementById('wallet-pay-link').href = data.paymentLink;
                             
-                            // Update dynamic BTCPay details
-                            if (data.destination) {
-                                document.getElementById('btc-addr').innerText = data.destination;
+                            const derBadge = document.getElementById('derivation-badge');
+                            if (derBadge) {
+                                derBadge.innerText = `#${data.derivationIndex}` + (data.isReused ? ' (reused)' : '');
                             }
-                            if (data.btcAmount) {
-                                const badge = document.getElementById('btc-amount-badge');
-                                badge.innerText = `${data.btcAmount} BTC ($499 USD)`;
-                                badge.classList.remove('hidden');
-                            }
-                            if (data.paymentLink || data.destination) {
-                                const qrTarget = data.paymentLink || ('bitcoin:' + data.destination + '?amount=499');
-                                document.getElementById('btc-qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(qrTarget);
-                            }
-                            if (data.checkoutLink) {
-                                const btn = document.getElementById('btcpay-checkout-link'); if (btn) btn.href = data.checkoutLink;
-                            }
+
+                            // 15-minute countdown
+                            expiryTimestamp = Date.now() + ((data.expiresInSeconds || 900) * 1000);
+                            startCountdown();
 
                             openModal();
                             startStatusPolling();
                         } else {
-                            alert('Could not initialize BTCPay invoice: ' + (data.message || 'Error'));
+                            alert('Could not initialize Bitcoin checkout: ' + (data.message || 'Error'));
                         }
                     } catch (err) {
                         console.error(err);
-                        alert('Error connecting to BTCPay Server. Please try again.');
+                        alert('Error connecting to Bitcoin checkout. Please try again.');
                     } finally {
                         purchaseBtn.disabled = false;
                         purchaseBtn.innerHTML = originalText;
@@ -352,35 +300,62 @@
             document.getElementById('payment-modal').classList.add('hidden');
             document.getElementById('payment-modal').classList.remove('flex');
             stopStatusPolling();
+            stopCountdown();
         }
 
         function copyAddr() {
             const addr = document.getElementById('btc-addr').innerText;
             navigator.clipboard.writeText(addr);
-            alert('Bitcoin Address Copied!');
+            alert('Bitcoin Address Copied: ' + addr);
+        }
+
+        function startCountdown() {
+            stopCountdown();
+            const timerEl = document.getElementById('countdown-timer');
+            countdownInterval = setInterval(() => {
+                const diff = Math.max(0, Math.floor((expiryTimestamp - Date.now()) / 1000));
+                const mins = String(Math.floor(diff / 60)).padStart(2, '0');
+                const secs = String(diff % 60).padStart(2, '0');
+                timerEl.innerText = `${mins}:${secs}`;
+
+                if (diff <= 0) {
+                    stopCountdown();
+                    const statusText = document.getElementById('payment-status-text');
+                    if (statusText) statusText.innerText = 'Invoice expired. Please generate a new one.';
+                }
+            }, 1000);
+        }
+
+        function stopCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
         }
 
         function startStatusPolling() {
             stopStatusPolling();
-            if (!currentInvoiceId) return;
+            if (!currentOrderId) return;
 
             statusPollingInterval = setInterval(async () => {
                 try {
-                    let settled = false;
-                    if (window.location.hostname.includes('github.io')) {
-                        const res = await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices/${currentInvoiceId}`, {
-                            headers: { 'Authorization': `token ${BTCPAY_DIRECT.apiKey}` }
-                        });
-                        const inv = await res.json();
-                        settled = ['Settled', 'Complete', 'Paid'].includes(inv.status);
-                    } else {
-                        const res = await fetch(`/api/invoice-status?id=${currentInvoiceId}`);
-                        const data = await res.json();
-                        settled = data.settled;
-                    }
-                    if (settled) {
+                    const res = await fetch(`/verify_payment.php?order_id=${currentOrderId}`);
+                    const data = await res.json();
+                    
+                    if (data.status === 'paid' || data.settled) {
                         stopStatusPolling();
-                        onPaymentSuccess();
+                        stopCountdown();
+                        onPaymentSuccess(data.isMempoolZeroConf);
+                    } else if (data.status === 'partial') {
+                        const statusText = document.getElementById('payment-status-text');
+                        if (statusText) {
+                            statusText.innerHTML = `<span class="text-amber-600 font-bold">Partial payment: ${data.receivedSats.toLocaleString()} Sats received. Still due: ${data.dueSats.toLocaleString()} Sats.</span>`;
+                        }
+                    } else if (data.status === 'expired') {
+                        stopStatusPolling();
+                        stopCountdown();
+                        const statusText = document.getElementById('payment-status-text');
+                        if (statusText) statusText.innerText = 'Order expired.';
                     }
                 } catch (e) {
                     console.warn('Status poll error:', e);
@@ -395,132 +370,46 @@
             }
         }
 
-        async function simulateSandboxPayment() {
-            if (!currentInvoiceId) {
-                alert('Please generate an invoice first.');
-                return;
-            }
-
-            const btn = document.getElementById('sandbox-pay-btn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span class="animate-pulse">Confirming Sandbox Payment...</span>';
-
-            try {
-                if (window.location.hostname.includes('github.io')) {
-                    await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices/${currentInvoiceId}/status`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `token ${BTCPAY_DIRECT.apiKey}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ status: "Settled" })
-                    });
-                    onPaymentSuccess();
-                } else {
-                    const userEmail = localStorage.getItem('user_email') || '';
-                    const res = await fetch('/api/simulate-payment', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ invoiceId: currentInvoiceId, email: userEmail })
-                    });
-                    const data = await res.json();
-
-                    if (data.success) {
-                        onPaymentSuccess();
-                    } else {
-                        alert('Sandbox payment failed: ' + (data.message || 'Error'));
-                        btn.disabled = false;
-                        btn.innerHTML = originalText;
-                    }
-                }
-            } catch (err) {
-                try {
-                    await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices/${currentInvoiceId}/status`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `token ${BTCPAY_DIRECT.apiKey}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ status: "Settled" })
-                    });
-                    onPaymentSuccess();
-                } catch (e2) {
-                    alert('Network error simulating sandbox payment.');
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }
-            }
-        }
-
-        async function onPaymentSuccess() {
+        async function onPaymentSuccess(isZeroConf = false) {
             stopStatusPolling();
+            stopCountdown();
             const statusIndicator = document.getElementById('status-indicator');
             if (statusIndicator) {
-                statusIndicator.className = 'w-2 h-2 rounded-full bg-green-500 inline-block';
+                statusIndicator.className = 'w-2.5 h-2.5 rounded-full bg-green-500 inline-block';
             }
             const statusText = document.getElementById('payment-status-text');
             if (statusText) {
-                statusText.innerHTML = '<span class="text-green-600 font-black">✅ Payment Confirmed! Sending email...</span>';
+                statusText.innerHTML = '<span class="text-green-600 font-black">✅ Payment Confirmed on Bitcoin Blockchain!</span>';
             }
             const modalHeader = document.getElementById('modal-header');
             if (modalHeader) {
-                modalHeader.innerHTML = '<h2 class="text-lg font-black text-green-600 uppercase">Payment Successful!</h2><p class="text-[9px] text-slate-500 font-bold uppercase">Sending confirmation email & redirecting...</p>';
-            }
-
-            // Send confirmation email via Resend
-            try {
-                const userEmail = localStorage.getItem('user_email') || '';
-                if (userEmail) {
-                    await fetch('/api/send-confirmation-email', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: userEmail,
-                            invoiceId: currentInvoiceId || 'N/A',
-                            txHash: currentInvoiceId || 'N/A'
-                        })
-                    });
-                }
-            } catch (e) {
-                console.warn('Email send error:', e);
+                modalHeader.innerHTML = '<h2 class="text-lg font-black text-green-600 uppercase">Payment Confirmed!</h2><p class="text-[9px] text-slate-500 font-bold uppercase">Transaction detected. Redirecting to access portal...</p>';
             }
 
             setTimeout(() => {
                 window.location.href = 'success';
-            }, 1500);
+            }, 1800);
         }
 
-        // Standalone Verification (For TxID or Invoice ID)
+        // Standalone Verification (For TxID or Bitcoin Address)
         async function verifyStandaloneTx() {
             const txInput = document.getElementById('standalone-txid').value.trim();
             if (!txInput) {
-                alert("Please enter a Bitcoin TxID or BTCPay Invoice ID.");
+                alert("Please enter a Bitcoin Address or Order ID.");
                 return;
             }
 
             try {
-                let settled = false;
-                if (window.location.hostname.includes('github.io')) {
-                    const res = await fetch(`${BTCPAY_DIRECT.host}/api/v1/stores/${BTCPAY_DIRECT.storeId}/invoices/${txInput}`, {
-                        headers: { 'Authorization': `token ${BTCPAY_DIRECT.apiKey}` }
-                    });
-                    const inv = await res.json();
-                    settled = ['Settled', 'Complete', 'Paid'].includes(inv.status);
-                } else {
-                    const res = await fetch(`/api/invoice-status?id=${txInput}`);
-                    const data = await res.json();
-                    settled = data.settled;
-                }
-                if (settled) {
-                    alert("BTCPay Server Payment Verified! Redirecting...");
+                const res = await fetch(`/verify_payment.php?order_id=${txInput}&address=${txInput}`);
+                const data = await res.json();
+                if (data.status === 'paid' || data.settled) {
+                    alert("Bitcoin Payment Verified! Redirecting...");
                     window.location.href = 'success';
                     return;
                 }
             } catch (e) {}
 
-            alert("Payment Verified! Software access link has been confirmed.");
-            window.location.href = 'success';
+            alert("Address/Order checked. Please complete payment before verifying.");
         }
     </script>
 </body>
