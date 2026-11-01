@@ -4,8 +4,14 @@
 define('BTC_XPUB', 'xpub6BemYiVNp19ZzLHf9jYggapPP7UeApuWES8dnHaH8R377D9Mm7NEgwcxHV9FwR1zNQQPKURXn8XTZv5Wzvqxut2gnnTXq3Wj5fE2PGsBxGc');
 define('BTC_CHANGE_INDEX', 0); // 0 for external receive addresses (/0/*)
 define('PRODUCT_PRICE_USD', 499.00);
-define('ORDER_EXPIRY_MINUTES', 15);
+define('ORDER_EXPIRY_MINUTES', 30); // 30 minutes QR expiration window
+define('ALLOWED_UNDERPAYMENT_PERCENTAGE', 1.5); // Allow up to 1.5% fee / underpayment tolerance
 define('MEMPOOL_API_BASE', 'https://mempool.space/api');
+
+// Email Notifications (via Resend)
+define('RESEND_API_KEY', 're_ByLWgbEk_PpKVYAhqqnBfEQ1wjnjeitgv');
+define('RESEND_FROM', 'Ctooz Support <support@ctooz.com>');
+define('DOWNLOAD_LINK', 'https://ctooz.com/success');
 
 // Database Configuration: Uses SQLite by default for zero-setup, or MySQL if configured
 define('DB_TYPE', 'sqlite'); // 'sqlite' or 'mysql'
