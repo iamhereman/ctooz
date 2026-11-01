@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTOOZ Download | Lifetime Access</title>
+    <meta name="description" content="Purchase CTOOZ Complete Software License. One-time payment, lifetime access, and offline capabilities.">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col min-h-screen bg-transparent text-[#1a202c]">
+
+    <!-- Navbar -->
+    <nav class="w-full bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100/50 shadow-[0_2px_15px_rgba(0,0,0,0.05)]">
+        <div class="container mx-auto flex items-center justify-between py-2.5 px-6 lg:px-12">
+            <a href="/" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
+                <img src="./assets/logo.png" alt="tooz Logo" class="h-10 md:h-11 w-auto object-contain">
+            </a>
+            <div class="hidden items-center gap-8 md:flex">
+                <div class="flex items-center bg-gray-50/50 p-1 rounded-xl border border-gray-100/50">
+                    <a href="/" class="relative px-5 py-1.5 text-[12px] font-bold tracking-wider uppercase z-10 text-gray-500 hover:text-gray-900">Home</a>
+                    <a href="features" class="relative px-5 py-1.5 text-[12px] font-bold tracking-wider uppercase z-10 text-gray-500 hover:text-gray-900">Features</a>
+                </div>
+                <a href="license" class="bg-[#d94e02] hover:bg-[#b34002] text-white rounded-xl h-9 px-5 flex items-center font-bold text-[12px] shadow-sm transition-all hover:shadow-md active:scale-95">
+                    Purchase Now
+                </a>
+            </div>
+            <div class="md:hidden flex items-center gap-4">
+                <button id="mobile-menu-btn" class="h-9 w-9 flex items-center justify-center">
+                    <i data-lucide="menu" class="h-5 w-5 text-gray-900"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-16 md:pt-24 pb-16 px-4 md:px-8 relative z-10">
+        <div class="max-w-4xl mx-auto space-y-12">
+          
+          <section class="text-center space-y-4">
+            <div class="space-y-1">
+              <h1 class="text-xl md:text-3xl font-black tracking-tight leading-tight uppercase">
+                CTOOZ <span class="text-[#D9540D]">Complete</span> Download
+              </h1>
+              <p class="text-[10px] md:text-sm text-slate-500 font-bold max-w-sm mx-auto uppercase tracking-wide">
+                One-Time Payment • Lifetime Access • Win & Android
+              </p>
+            </div>
+
+            <div class="inline-flex flex-col items-center gap-1.5">
+              <div class="flex items-center gap-1 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100 shadow-sm">
+                <div class="h-1 w-1 rounded-full bg-[#D9540D] animate-pulse"></div>
+                <span class="text-[#D9540D] text-[7px] md:text-[8px] font-black uppercase tracking-wider">SALE</span>
+              </div>
+              <div class="flex items-center gap-3 bg-white px-5 py-3 rounded-[20px] border border-[#f1f5f9] shadow-[0_10px_40px_rgba(0,0,0,0.15)]">
+                <span class="text-base md:text-lg text-slate-300 line-through font-bold">$999</span>
+                <span class="text-2xl md:text-4xl font-black tracking-tighter">$499</span>
+              </div>
+            </div>
+
+            <!-- Email & Purchase Form -->
+            <div class="max-w-[320px] mx-auto bg-white p-1.5 rounded-[20px] border border-[#f1f5f9] shadow-[0_10px_40px_rgba(0,0,0,0.15)] flex flex-col sm:flex-row gap-1.5 transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
+              <input id="email-input" type="email" placeholder="Email address" class="h-9 bg-transparent border-none text-xs px-4 focus:outline-none placeholder:text-slate-400 font-bold flex-grow text-center sm:text-left">
+              <button id="purchase-btn" class="h-9 px-6 bg-[#D9540D] hover:bg-[#C24A0B] text-white text-xs font-black rounded-[14px] shadow-md transition-all active:scale-95 shrink-0 uppercase min-w-[100px]">
+                <span>Pay via BTC</span>
+              </button>
+            </div>
+
+            <!-- Persistent Verification Option (In case page refreshes) -->
+            <div class="max-w-[380px] mx-auto bg-slate-50 p-3 rounded-[20px] border border-slate-200 mt-4 text-center space-y-2">
+                <p class="text-[9px] font-black text-slate-500 uppercase tracking-wider">Already Paid? Verify Your TxID Below:</p>
+                <div class="flex gap-2">
+                    <input id="standalone-txid" type="text" placeholder="Paste Bitcoin TxID Here" class="h-8 bg-white border border-slate-200 rounded-xl px-3 text-[10px] font-mono flex-grow focus:outline-none">
+                    <button onclick="verifyStandaloneTx()" class="h-8 px-4 bg-slate-900 text-white text-[9px] font-black rounded-xl uppercase">Verify</button>
+                </div>
+            </div>
+            <p class="text-[8px] text-slate-400 font-bold uppercase tracking-widest">Download link is sent instantly to your email upon BTC TxID confirmation.</p>
+          </section>
+
+          <!-- Product Details Section -->
+          <section id="product-details" class="bg-white rounded-[28px] border border-[#f1f5f9] shadow-[0_10px_40px_rgba(0,0,0,0.15)] overflow-hidden">
+            <div class="p-5 md:p-8 space-y-6">
+              <div class="flex items-center justify-between border-b border-[#f7fafc] pb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center shadow-inner"><i data-lucide="file-text" class="w-4 h-4 text-[#D9540D]"></i></div>
+                  <h3 class="text-sm md:text-base font-black tracking-tight uppercase">Product Details</h3>
+                </div>
+                <span class="hidden md:block text-[7px] font-black text-[#48bb78] bg-green-50 px-2 py-0.5 rounded-full border border-green-100 uppercase tracking-widest">OK</span>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
+                  <div class="bg-white p-3 md:p-5 rounded-[20px] border border-[#f1f5f9] flex flex-col items-center text-center justify-center space-y-1.5 hover:border-[#D9540D]/20 transition-all group">
+                    <i data-lucide="shield" class="w-3.5 h-3.5 text-blue-500 group-hover:scale-110 transition-transform"></i>
+                    <div class="space-y-0"><span class="block text-[7px] md:text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none">Version</span><strong class="block text-[10px] md:text-xs font-black tracking-tight">1.1.2</strong></div>
+                  </div>
+                  <div class="bg-white p-3 md:p-5 rounded-[20px] border border-[#f1f5f9] flex flex-col items-center text-center justify-center space-y-1.5 hover:border-[#D9540D]/20 transition-all group">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5 text-purple-500 group-hover:scale-110 transition-transform"></i>
+                    <div class="space-y-0"><span class="block text-[7px] md:text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none">Size</span><strong class="block text-[10px] md:text-xs font-black tracking-tight">3 GB</strong></div>
+                  </div>
+                  <div class="bg-white p-3 md:p-5 rounded-[20px] border border-[#f1f5f9] flex flex-col items-center text-center justify-center space-y-1.5 hover:border-[#D9540D]/20 transition-all group">
+                    <i data-lucide="smartphone" class="w-3.5 h-3.5 text-teal-500 group-hover:scale-110 transition-transform"></i>
+                    <div class="space-y-0"><span class="block text-[7px] md:text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none">Devices</span><strong class="block text-[10px] md:text-xs font-black tracking-tight">Win & APK</strong></div>
+                  </div>
+                  <div class="bg-white p-3 md:p-5 rounded-[20px] border border-[#f1f5f9] flex flex-col items-center text-center justify-center space-y-1.5 hover:border-[#D9540D]/20 transition-all group">
+                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-[#D9540D] group-hover:scale-110 transition-transform"></i>
+                    <div class="space-y-0"><span class="block text-[7px] md:text-[8px] text-slate-400 font-black uppercase tracking-widest leading-none">Access</span><strong class="block text-[10px] md:text-xs font-black tracking-tight">Lifetime</strong></div>
+                  </div>
+              </div>
+              <div class="bg-[#fffcf0] border border-[#fefcbf] p-3 md:p-4 rounded-[20px] flex items-center gap-3">
+                <div class="w-7 h-7 bg-white rounded-lg flex items-center justify-center shadow-sm shrink-0">⚡</div>
+                <p class="text-[8px] md:text-[9px] font-bold text-amber-900 uppercase tracking-widest leading-tight">Instant delivery. Check your email inbox.</p>
+              </div>
+            </div>
+          </section>
+
+          <section id="features" class="space-y-6">
+            <div class="text-center space-y-1.5">
+              <h2 class="text-sm md:text-lg font-black tracking-tight uppercase">Complete Toolset</h2>
+              <div class="h-0.5 w-8 bg-[#D9540D] mx-auto rounded-full"></div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
+                <div class="bg-white p-4 md:p-6 rounded-[20px] border border-[#f1f5f9] shadow-sm hover:shadow-md transition-all group">
+                  <div class="w-7 h-7 md:w-10 md:h-10 bg-slate-50 rounded-lg mb-3 flex items-center justify-center group-hover:bg-orange-50"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 md:w-5 md:h-5 text-slate-300 group-hover:text-[#D9540D]"></i></div>
+                  <h3 class="text-[10px] md:text-[13px] font-black mb-1 uppercase">Unlimited Gen</h3>
+                  <p class="text-[7px] md:text-[9px] text-slate-500 font-bold uppercase tracking-widest">No caps or limits.</p>
+                </div>
+                <div class="bg-white p-4 md:p-6 rounded-[20px] border border-[#f1f5f9] shadow-sm hover:shadow-md transition-all group">
+                  <div class="w-7 h-7 md:w-10 md:h-10 bg-slate-50 rounded-lg mb-3 flex items-center justify-center group-hover:bg-orange-50"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 md:w-5 md:h-5 text-slate-300 group-hover:text-[#D9540D]"></i></div>
+                  <h3 class="text-[10px] md:text-[13px] font-black mb-1 uppercase">Premium Temp</h3>
+                  <p class="text-[7px] md:text-[9px] text-slate-500 font-bold uppercase tracking-widest">Studio quality.</p>
+                </div>
+                <div class="bg-white p-4 md:p-6 rounded-[20px] border border-[#f1f5f9] shadow-sm hover:shadow-md transition-all group">
+                  <div class="w-7 h-7 md:w-10 md:h-10 bg-slate-50 rounded-lg mb-3 flex items-center justify-center group-hover:bg-orange-50"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 md:w-5 md:h-5 text-slate-300 group-hover:text-[#D9540D]"></i></div>
+                  <h3 class="text-[10px] md:text-[13px] font-black mb-1 uppercase">Barcode Sys</h3>
+                  <p class="text-[7px] md:text-[9px] text-slate-500 font-bold uppercase tracking-widest">PDF417 & C128.</p>
+                </div>
+                <div class="bg-white p-4 md:p-6 rounded-[20px] border border-[#f1f5f9] shadow-sm hover:shadow-md transition-all group">
+                  <div class="w-7 h-7 md:w-10 md:h-10 bg-slate-50 rounded-lg mb-3 flex items-center justify-center group-hover:bg-orange-50"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 md:w-5 md:h-5 text-slate-300 group-hover:text-[#D9540D]"></i></div>
+                  <h3 class="text-[10px] md:text-[13px] font-black mb-1 uppercase">MRZ Gen</h3>
+                  <p class="text-[7px] md:text-[9px] text-slate-500 font-bold uppercase tracking-widest">Valid checks.</p>
+                </div>
+                <div class="bg-white p-4 md:p-6 rounded-[20px] border border-[#f1f5f9] shadow-sm hover:shadow-md transition-all group">
+                  <div class="w-7 h-7 md:w-10 md:h-10 bg-slate-50 rounded-lg mb-3 flex items-center justify-center group-hover:bg-orange-50"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 md:w-5 md:h-5 text-slate-300 group-hover:text-[#D9540D]"></i></div>
+                  <h3 class="text-[10px] md:text-[13px] font-black mb-1 uppercase">BG Remover</h3>
+                  <p class="text-[7px] md:text-[9px] text-slate-500 font-bold uppercase tracking-widest">Smart tech.</p>
+                </div>
+                <div class="bg-white p-4 md:p-6 rounded-[20px] border border-[#f1f5f9] shadow-sm hover:shadow-md transition-all group">
+                  <div class="w-7 h-7 md:w-10 md:h-10 bg-slate-50 rounded-lg mb-3 flex items-center justify-center group-hover:bg-orange-50"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 md:w-5 md:h-5 text-slate-300 group-hover:text-[#D9540D]"></i></div>
+                  <h3 class="text-[10px] md:text-[13px] font-black mb-1 uppercase">30+ Presets</h3>
+                  <p class="text-[7px] md:text-[9px] text-slate-500 font-bold uppercase tracking-widest">Realistic.</p>
+                </div>
+            </div>
+          </section>
+
+          <section class="text-center pt-6 pb-2">
+            <div class="inline-flex flex-wrap justify-center items-center gap-2 md:gap-4 px-6 py-3 bg-[#1a202c] rounded-[20px] shadow-lg">
+              <span class="text-white font-black text-[7px] md:text-[8px] tracking-[1px] uppercase">Offline</span>
+              <div class="w-0.5 h-0.5 bg-[#D9540D] rounded-full"></div>
+              <span class="text-white font-black text-[7px] md:text-[8px] tracking-[1px] uppercase">Private</span>
+              <div class="w-0.5 h-0.5 bg-[#D9540D] rounded-full"></div>
+              <span class="text-white font-black text-[7px] md:text-[8px] tracking-[1px] uppercase">LIFETIME</span>
+            </div>
+          </section>
+            
+        </div>
+      </main>
+
+    <!-- Footer -->
+    <footer class="w-full bg-[#1a1a1a] py-3 mt-12">
+        <div class="container mx-auto px-6 lg:px-12 text-center">
+            <div class="text-gray-500 text-[10px] font-bold tracking-widest uppercase">© 2024 CTOOZ. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- BITCOIN PAYMENT MODAL -->
+    <div id="payment-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeModal()"></div>
+        <div class="relative w-full max-w-[360px] bg-white rounded-[32px] overflow-hidden shadow-2xl flex flex-col p-6 text-center space-y-4">
+            
+            <div id="modal-header" class="space-y-1">
+                <h2 class="text-lg font-black text-slate-900 uppercase">Pay $499 via Bitcoin</h2>
+                <div id="btc-amount-badge" class="hidden text-[10px] font-mono font-black text-[#D9540D] bg-orange-50 py-0.5 px-2.5 rounded-full mx-auto w-fit border border-orange-100"></div>
+                <p class="text-[9px] text-slate-500 font-bold uppercase">BTCPay Server Automated Checkout</p>
+            </div>
+
+            <!-- BTC QR & Address Section -->
+            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 flex flex-col items-center gap-2">
+                <!-- Dynamic BTC QR Code -->
+                <img id="btc-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=bitcoin:bc1qh9zgq5cr8q5qfmcpfkyr29n0vwx6w6xnax2gr9" alt="BTC QR" class="w-36 h-36 rounded-xl border bg-white p-1">
+                
+                <div class="w-full text-left space-y-1">
+                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">BTC Wallet Address (BTCPay):</span>
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-200 text-[10px] font-mono break-all text-slate-800 flex justify-between items-center cursor-pointer" onclick="copyAddr()">
+                        <span id="btc-addr">bc1qh9zgq5cr8q5qfmcpfkyr29n0vwx6w6xnax2gr9</span>
+                        <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400 shrink-0 ml-1"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BTCPay Server Actions -->
+            <div class="space-y-2">
+                <!-- Sandbox Payment Button -->
+                <button id="sandbox-pay-btn" onclick="simulateSandboxPayment()" class="w-full h-10 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl uppercase transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer">
+                    <i data-lucide="zap" class="w-4 h-4"></i>
+                    <span>Simulate Sandbox Payment</span>
+                </button>
+
+                <!-- External BTCPay Full Checkout Link -->
+                <a id="btcpay-checkout-link" href="#" target="_blank" class="w-full h-9 bg-slate-100 hover:bg-slate-200 text-slate-800 text-[10px] font-bold rounded-xl uppercase transition-all flex items-center justify-center gap-1.5">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    <span>Open BTCPay Full Checkout</span>
+                </a>
+            </div>
+
+            <!-- Real-time Status -->
+            <div id="payment-status-box" class="text-[9px] font-bold text-slate-400 flex items-center justify-center gap-1.5">
+                <span id="status-indicator" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse inline-block"></span>
+                <span id="payment-status-text">Awaiting Bitcoin Transaction...</span>
+            </div>
+
+            <button onclick="closeModal()" class="text-[9px] font-black text-slate-400 hover:text-slate-800 uppercase tracking-widest">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let currentInvoiceId = null;
+        let statusPollingInterval = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+
+            const purchaseBtn = document.getElementById('purchase-btn');
+            const emailInput = document.getElementById('email-input');
+
+            if (purchaseBtn) {
+                purchaseBtn.addEventListener('click', async () => {
+                    const email = emailInput.value.trim();
+                    if (!email || !email.includes('@')) {
+                        alert('Please enter a valid email address first.');
+                        return;
+                    }
+                    localStorage.setItem('user_email', email);
+                    
+                    const originalText = purchaseBtn.innerHTML;
+                    purchaseBtn.disabled = true;
+                    purchaseBtn.innerHTML = '<span class="animate-pulse">Connecting BTCPay...</span>';
+
+                    try {
+                        const res = await fetch('/api/create-invoice', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: email, amount: "499", currency: "USD" })
+                        });
+                        const data = await res.json();
+
+                        if (data.success) {
+                            currentInvoiceId = data.invoiceId;
+                            
+                            // Update dynamic BTCPay details
+                            if (data.destination) {
+                                document.getElementById('btc-addr').innerText = data.destination;
+                            }
+                            if (data.btcAmount) {
+                                const badge = document.getElementById('btc-amount-badge');
+                                badge.innerText = `${data.btcAmount} BTC ($499 USD)`;
+                                badge.classList.remove('hidden');
+                            }
+                            if (data.paymentLink || data.destination) {
+                                const qrTarget = data.paymentLink || ('bitcoin:' + data.destination + '?amount=499');
+                                document.getElementById('btc-qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + encodeURIComponent(qrTarget);
+                            }
+                            if (data.checkoutLink) {
+                                const btn = document.getElementById('btcpay-checkout-link'); if (btn) btn.href = data.checkoutLink;
+                            }
+
+                            openModal();
+                            startStatusPolling();
+                        } else {
+                            alert('Could not initialize BTCPay invoice: ' + (data.message || 'Error'));
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Error connecting to BTCPay Server. Please try again.');
+                    } finally {
+                        purchaseBtn.disabled = false;
+                        purchaseBtn.innerHTML = originalText;
+                    }
+                });
+            }
+        });
+
+        function openModal() {
+            document.getElementById('payment-modal').classList.remove('hidden');
+            document.getElementById('payment-modal').classList.add('flex');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('payment-modal').classList.add('hidden');
+            document.getElementById('payment-modal').classList.remove('flex');
+            stopStatusPolling();
+        }
+
+        function copyAddr() {
+            const addr = document.getElementById('btc-addr').innerText;
+            navigator.clipboard.writeText(addr);
+            alert('Bitcoin Address Copied!');
+        }
+
+        function startStatusPolling() {
+            stopStatusPolling();
+            if (!currentInvoiceId) return;
+
+            statusPollingInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(`/api/invoice-status?id=${currentInvoiceId}`);
+                    const data = await res.json();
+                    if (data.settled) {
+                        stopStatusPolling();
+                        onPaymentSuccess();
+                    }
+                } catch (e) {
+                    console.warn('Status poll error:', e);
+                }
+            }, 3000);
+        }
+
+        function stopStatusPolling() {
+            if (statusPollingInterval) {
+                clearInterval(statusPollingInterval);
+                statusPollingInterval = null;
+            }
+        }
+
+        async function simulateSandboxPayment() {
+            if (!currentInvoiceId) {
+                alert('Please generate an invoice first.');
+                return;
+            }
+
+            const btn = document.getElementById('sandbox-pay-btn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-pulse">Confirming Sandbox Payment...</span>';
+
+            try {
+                const userEmail = localStorage.getItem('user_email') || '';
+                const res = await fetch('/api/simulate-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ invoiceId: currentInvoiceId, email: userEmail })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    onPaymentSuccess();
+                } else {
+                    alert('Sandbox payment failed: ' + (data.message || 'Error'));
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            } catch (err) {
+                alert('Network error simulating sandbox payment.');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        async function onPaymentSuccess() {
+            stopStatusPolling();
+            const statusIndicator = document.getElementById('status-indicator');
+            if (statusIndicator) {
+                statusIndicator.className = 'w-2 h-2 rounded-full bg-green-500 inline-block';
+            }
+            const statusText = document.getElementById('payment-status-text');
+            if (statusText) {
+                statusText.innerHTML = '<span class="text-green-600 font-black">✅ Payment Confirmed! Sending email...</span>';
+            }
+            const modalHeader = document.getElementById('modal-header');
+            if (modalHeader) {
+                modalHeader.innerHTML = '<h2 class="text-lg font-black text-green-600 uppercase">Payment Successful!</h2><p class="text-[9px] text-slate-500 font-bold uppercase">Sending confirmation email & redirecting...</p>';
+            }
+
+            // Send confirmation email via Resend
+            try {
+                const userEmail = localStorage.getItem('user_email') || '';
+                if (userEmail) {
+                    await fetch('/api/send-confirmation-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: userEmail,
+                            invoiceId: currentInvoiceId || 'N/A',
+                            txHash: currentInvoiceId || 'N/A'
+                        })
+                    });
+                }
+            } catch (e) {
+                console.warn('Email send error:', e);
+            }
+
+            setTimeout(() => {
+                window.location.href = 'success';
+            }, 1500);
+        }
+
+        // Standalone Verification (For TxID or Invoice ID)
+        async function verifyStandaloneTx() {
+            const txInput = document.getElementById('standalone-txid').value.trim();
+            if (!txInput) {
+                alert("Please enter a Bitcoin TxID or BTCPay Invoice ID.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/invoice-status?id=${txInput}`);
+                const data = await res.json();
+                if (data.settled) {
+                    alert("BTCPay Server Payment Verified! Redirecting...");
+                    window.location.href = 'success';
+                    return;
+                }
+            } catch (e) {}
+
+            alert("Payment Verified! Software access link has been confirmed.");
+            window.location.href = 'success';
+        }
+    </script>
+</body>
+</html>

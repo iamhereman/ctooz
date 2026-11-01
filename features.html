@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features | CTOOZ Software</title>
+    <meta name="description" content="Explore the powerful features of CTOOZ Complete Software Package.">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col min-h-screen bg-transparent">
+
+    <!-- Navbar -->
+    <nav class="w-full bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100/50 shadow-[0_2px_15px_rgba(0,0,0,0.05)]">
+        <div class="container mx-auto flex items-center justify-between py-2.5 px-6 lg:px-12">
+            <a href="/" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
+                <img src="./assets/logo.png" alt="tooz Logo" class="h-10 md:h-11 w-auto object-contain">
+            </a>
+            <div class="hidden items-center gap-8 md:flex">
+                <div class="flex items-center bg-gray-50/50 p-1 rounded-xl border border-gray-100/50">
+                    <a href="/" class="relative px-5 py-1.5 text-[12px] font-bold tracking-wider uppercase z-10 text-gray-500 hover:text-gray-900">Home</a>
+                    <a href="features" class="relative px-5 py-1.5 text-[12px] font-bold tracking-wider uppercase z-10 text-[#d94e02]">
+                        Features
+                        <div class="absolute inset-0 bg-white shadow-sm border border-gray-100 rounded-lg -z-10"></div>
+                    </a>
+                </div>
+                <a href="license" class="bg-[#d94e02] hover:bg-[#b34002] text-white rounded-xl h-9 px-5 flex items-center font-bold text-[12px] shadow-sm transition-all hover:shadow-md active:scale-95">
+                    Purchase Now
+                </a>
+            </div>
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center gap-4">
+                <button id="mobile-menu-btn" class="h-9 w-9 flex items-center justify-center">
+                    <i data-lucide="menu" class="h-5 w-5 text-gray-900"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Sidebar -->
+    <div id="mobile-sidebar" class="fixed inset-0 z-50 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" id="mobile-sidebar-overlay"></div>
+        <div class="absolute right-0 top-0 h-full w-[300px] bg-white p-6 shadow-xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black uppercase tracking-tight">Navigation</h2>
+                <button id="mobile-sidebar-close" class="h-9 w-9 flex items-center justify-center">
+                    <i data-lucide="x" class="h-5 w-5 text-gray-900"></i>
+                </button>
+            </div>
+            <div class="flex flex-col gap-3">
+                <a href="/" class="px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-wide text-gray-600 hover:bg-gray-50">Home</a>
+                <a href="features" class="px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-wide bg-orange-50 text-[#d94e02] border border-orange-100">Features</a>
+                <div class="pt-4 mt-4 border-t border-gray-100">
+                    <a href="license" class="bg-[#d94e02] w-full h-12 flex items-center justify-center text-white text-base font-bold rounded-xl shadow-lg shadow-orange-500/20">Purchase Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="flex-grow pt-16 md:pt-24 pb-16">
+        <div class="container mx-auto px-6 lg:px-12 text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#1a202c] tracking-tight leading-tight uppercase">
+                Our <span class="text-[#D9540D]">Core</span> Features
+            </h1>
+            <p class="text-slate-500 font-bold mt-4 uppercase tracking-widest">
+                Everything you need for document processing
+            </p>
+        </div>
+
+        <!-- Floating Video Section -->
+        <div class="max-w-2xl mx-auto mb-20 px-6 transform transition-transform hover:scale-[1.02] duration-500">
+            <div class="relative aspect-video rounded-xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.12)] border border-white/50 backdrop-blur-sm bg-white/30">
+                <iframe loading="lazy" src="https://player.vimeo.com/video/1214832449?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;like=0&amp;share=0&amp;vimeo_logo=0&amp;dnt=1&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="1.2.3"></iframe>
+</div>
+            <!-- Decorative element under video -->
+            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-1/2 h-8 bg-[#D9540D]/10 blur-3xl -z-10 rounded-full"></div>
+        </div>
+
+        <!-- Features Grid -->
+        <section class="w-full py-4 bg-transparent">
+            <div class="container mx-auto px-2 md:px-12">
+                <div class="max-w-5xl mx-auto grid grid-cols-3 gap-2 md:gap-8">
+                    <!-- Feature 1 -->
+                    <div class="border border-gray-100 shadow-md bg-white rounded-xl md:rounded-[32px] overflow-hidden h-full min-h-[140px] md:min-h-[240px]">
+                        <div class="flex flex-col items-center justify-start p-2 md:p-8 text-center gap-1 md:gap-4 h-full">
+                            <div class="shrink-0 mt-1 md:mt-0">
+                                <i data-lucide="cloud" class="h-6 w-6 md:h-12 md:w-12 text-[#D9540D]"></i>
+                            </div>
+                            <div class="flex flex-col gap-0.5 md:gap-1 overflow-hidden">
+                                <h3 class="text-[9px] md:text-lg font-black tracking-tight text-black leading-tight line-clamp-2">Unlimited Document Generation:</h3>
+                                <p class="text-[8px] md:text-sm text-gray-500 font-medium leading-tight line-clamp-3">No volume limits, just results.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="border border-gray-100 shadow-md bg-white rounded-xl md:rounded-[32px] overflow-hidden h-full min-h-[140px] md:min-h-[240px]">
+                        <div class="flex flex-col items-center justify-start p-2 md:p-8 text-center gap-1 md:gap-4 h-full">
+                            <div class="shrink-0 mt-1 md:mt-0">
+                                <i data-lucide="banknote" class="h-6 w-6 md:h-12 md:w-12 text-[#D9540D]"></i>
+                            </div>
+                            <div class="flex flex-col gap-0.5 md:gap-1 overflow-hidden">
+                                <h3 class="text-[9px] md:text-lg font-black tracking-tight text-black leading-tight line-clamp-2">Per-Document Cost Eliminated:</h3>
+                                <p class="text-[8px] md:text-sm text-gray-500 font-medium leading-tight line-clamp-3">Pay once for the software, save forever.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="border border-gray-100 shadow-md bg-white rounded-xl md:rounded-[32px] overflow-hidden h-full min-h-[140px] md:min-h-[240px]">
+                        <div class="flex flex-col items-center justify-start p-2 md:p-8 text-center gap-1 md:gap-4 h-full">
+                            <div class="shrink-0 mt-1 md:mt-0">
+                                <i data-lucide="briefcase" class="h-6 w-6 md:h-12 md:w-12 text-[#D9540D]"></i>
+                            </div>
+                            <div class="flex flex-col gap-0.5 md:gap-1 overflow-hidden">
+                                <h3 class="text-[9px] md:text-lg font-black tracking-tight text-black leading-tight line-clamp-2">Comprehensive Suite:</h3>
+                                <p class="text-[8px] md:text-sm text-gray-500 font-medium leading-tight line-clamp-3">Inheriting 'Verif Tools' reliability with new capabilities.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Additional Features List -->
+        <div class="max-w-4xl mx-auto mt-20 px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.1)]">
+                <h3 class="text-xl font-bold mb-4 text-[#D9540D]">100% OFFLINE</h3>
+                <p class="text-gray-500 font-medium leading-relaxed">Work anywhere, anytime. No internet connection required for document generation.</p>
+            </div>
+            <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.1)]">
+                <h3 class="text-xl font-bold mb-4 text-[#D9540D]">DATA PRIVACY</h3>
+                <p class="text-gray-500 font-medium leading-relaxed">Your data never leaves your device. Total security and control over your sensitive information.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full bg-[#1a1a1a] py-3 mt-12">
+        <div class="container mx-auto px-6 lg:px-12 text-center">
+            <div class="text-gray-500 text-[10px] font-bold tracking-widest uppercase">© 2024 CTOOZ. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div class="fixed bottom-6 right-6 z-[100] flex flex-col items-center gap-4">
+        <!-- Telegram Link -->
+        <a href="https://t.me/ctooz_com" target="_blank" id="telegram-chat" class="group relative flex items-center justify-center w-14 h-14 bg-white rounded-2xl shadow-[0_15px_30px_rgba(0,0,0,0.15)] border border-gray-100 transition-all duration-500 hover:-translate-y-1 hover:scale-110 active:scale-95">
+            <img src="./assets/telegram-logo.png" alt="Telegram" class="w-8 h-8 object-contain">
+            <!-- Tooltip -->
+            <div class="absolute right-full mr-4 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl">
+                Chat on Telegram
+            </div>
+        </a>
+
+        <!-- Toggle Button -->
+        <button id="chat-toggle" class="flex items-center justify-center w-12 h-12 bg-white/30 backdrop-blur-md border border-white/50 rounded-full shadow-xl transition-all duration-300 hover:scale-110 active:scale-90 group">
+            <i data-lucide="plus" id="toggle-icon" class="w-6 h-6 text-[#D9540D] stroke-[3] transition-transform duration-500"></i>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Chat Widget Logic
+        const chatToggle = document.getElementById('chat-toggle');
+        const telegramChat = document.getElementById('telegram-chat');
+        const toggleIcon = document.getElementById('toggle-icon');
+        let isChatVisible = true;
+
+        chatToggle.addEventListener('click', () => {
+            isChatVisible = !isChatVisible;
+            
+            if (isChatVisible) {
+                // Show Logo, Make icon an 'X' (45deg rotation)
+                telegramChat.style.opacity = '1';
+                telegramChat.style.transform = 'translateY(0) scale(1)';
+                telegramChat.style.pointerEvents = 'auto';
+                toggleIcon.style.transform = 'rotate(45deg)';
+            } else {
+                // Hide Logo, Make icon a '+' (0deg rotation)
+                telegramChat.style.opacity = '0';
+                telegramChat.style.transform = 'translateY(20px) scale(0.8)';
+                telegramChat.style.pointerEvents = 'none';
+                toggleIcon.style.transform = 'rotate(0deg)';
+            }
+        });
+    </script>
+</body>
+</html>

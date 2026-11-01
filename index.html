@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTOOZ | generating unlimited fake ID documents.</title>
+    <meta name="description" content="You can create passports, ID cards, driver's licenses, bills, and bank statements of different countries in just 2 minutes.">
+    <meta name="keywords" content="ctooz powered by veriftools, veriftools alternative, veriftools software offline, fake passport generator software, no internet documents generator, privacy focus veriftools, fake document generator software, veriftools now offline">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+    
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "CTOOZ",
+  "operatingSystem": "Windows, Web",
+  "applicationCategory": "Utility",
+  "description": "Offline document generator tool with privacy focus.",
+  "url": "https://ctoozs.com"
+}
+</script>
+</head>
+<body class="flex flex-col min-h-screen bg-transparent">
+
+    <!-- Navbar -->
+    <nav class="w-full bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100/50 shadow-[0_2px_15px_rgba(0,0,0,0.05)]">
+        <div class="container mx-auto flex items-center justify-between py-2.5 px-6 lg:px-12">
+            <a href="/" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
+                <img src="./assets/logo.png" alt="tooz Logo" class="h-10 md:h-11 w-auto object-contain">
+            </a>
+            <div class="hidden items-center gap-8 md:flex">
+                <div class="flex items-center bg-gray-50/50 p-1 rounded-xl border border-gray-100/50">
+                    <a href="/" class="relative px-5 py-1.5 text-[12px] font-bold tracking-wider uppercase z-10 text-[#d94e02]">
+                        Home
+                        <div class="absolute inset-0 bg-white shadow-sm border border-gray-100 rounded-lg -z-10"></div>
+                    </a>
+                    <a href="features" class="relative px-5 py-1.5 text-[12px] font-bold tracking-wider uppercase z-10 text-gray-500 hover:text-gray-900">Features</a>
+                </div>
+                <a href="license" class="bg-[#d94e02] hover:bg-[#b34002] text-white rounded-xl h-9 px-5 flex items-center font-bold text-[12px] shadow-sm transition-all hover:shadow-md active:scale-95">
+                    Purchase Now
+                </a>
+            </div>
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center gap-4">
+                <button id="mobile-menu-btn" class="h-9 w-9 flex items-center justify-center">
+                    <i data-lucide="menu" class="h-5 w-5 text-gray-900"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Sidebar -->
+    <div id="mobile-sidebar" class="fixed inset-0 z-50 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" id="mobile-sidebar-overlay"></div>
+        <div class="absolute right-0 top-0 h-full w-[300px] bg-white p-6 shadow-xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black uppercase tracking-tight">Navigation</h2>
+                <button id="mobile-sidebar-close" class="h-9 w-9 flex items-center justify-center">
+                    <i data-lucide="x" class="h-5 w-5 text-gray-900"></i>
+                </button>
+            </div>
+            <div class="flex flex-col gap-3">
+                <a href="/" class="px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-wide bg-orange-50 text-[#d94e02] border border-orange-100">Home</a>
+                <a href="features" class="px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-wide text-gray-600 hover:bg-gray-50">Features</a>
+                <div class="pt-4 mt-4 border-t border-gray-100">
+                    <a href="license" class="bg-[#d94e02] w-full h-12 flex items-center justify-center text-white text-base font-bold rounded-xl shadow-lg shadow-orange-500/20">Purchase Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="flex-grow">
+        <!-- Hero Section -->
+        <section class="relative w-full pt-4 pb-16 md:pt-6 md:pb-20 lg:pt-8 lg:pb-32 overflow-hidden bg-transparent">
+            <div class="container mx-auto px-6 lg:px-12">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+                    <!-- Left Content -->
+                    <div class="flex flex-col items-center lg:items-start space-y-6 md:space-y-8 text-center lg:text-left">
+                        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 md:gap-6">
+                            <div class="flex items-center gap-2 md:gap-3">
+                                <div class="h-2 w-2 md:h-2.5 md:w-2.5 rounded-full bg-[#D9540D]"></div>
+                                <span class="text-[9px] md:text-[10px] font-bold text-[#D9540D] uppercase tracking-wider whitespace-nowrap">POWERED BY VERIFTOOLS</span>
+                            </div>
+                            <div class="inline-flex items-center gap-3 md:gap-4 bg-white/50 backdrop-blur-sm rounded-full px-4 py-2 md:px-5 md:py-2.5 border border-gray-100 shadow-sm">
+                                <img src="./assets/veriftools-badge.png" alt="Verif Tools" class="h-6 md:h-8 w-auto">
+                                <div class="flex flex-col">
+                                    <span class="text-[8px] md:text-[10px] font-bold text-[#D9540D] uppercase tracking-wider">VERIFTOOLS IS NOW CTOOZ</span>
+                                </div>
+                                <img src="./assets/ctooz-badge.png" alt="CTOOZ" class="h-6 md:h-8 w-6 md:w-8">
+                            </div>
+                        </div>
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight text-slate-900">
+                            Ctooz creating <span class="text-[#D9540D]">Unlimited</span> Photoshop frame  documents
+                        </h1>
+
+                        <!-- Animation Mobile -->
+                        <div class="block lg:hidden w-full py-4">
+                            <div id="hero-animation-mobile" class="hero-animation-container animate-float relative w-full max-w-[280px] mx-auto h-[300px] flex items-center justify-center">
+                                <!-- Docs will be injected by JS -->
+                            </div>
+                        </div>
+
+                        <p class="text-base md:text-xl text-gray-500 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                            You can create photos, profilr, id card's selfy,  just 2 minutes.
+                        </p>
+                        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 w-full sm:w-auto">
+                            <button onclick="document.getElementById('pricing').scrollIntoView({behavior: 'smooth'})" class="w-full sm:w-auto bg-[#D9540D] hover:bg-[#C24A0B] text-white rounded-xl h-12 md:h-14 px-8 md:px-10 font-bold text-sm md:text-base shadow-lg transition-all active:scale-95">Get Started Now</button>
+                            <a href="about" class="inline-flex items-center justify-center w-full sm:w-auto text-black hover:text-[#D9540D] font-semibold text-sm md:text-base h-12 md:h-14 px-8">Learn More</a>
+                        </div>
+                    </div>
+
+                    <!-- Right Content (Desktop) -->
+                    <div class="hidden lg:flex items-center justify-center lg:justify-end">
+                        <div id="hero-animation-desktop" class="hero-animation-container animate-float relative w-full max-w-md h-[500px] flex items-center justify-center">
+                            <!-- Docs will be injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="w-full py-4 bg-transparent scroll-mt-24">
+            <div class="container mx-auto px-2 md:px-12">
+                <div class="max-w-5xl mx-auto grid grid-cols-3 gap-2 md:gap-8">
+                    <!-- Feature 1 -->
+                    <div class="border border-gray-100 shadow-md bg-white rounded-xl md:rounded-[32px] overflow-hidden h-full min-h-[140px] md:min-h-[240px]">
+                        <div class="flex flex-col items-center justify-start p-2 md:p-8 text-center gap-1 md:gap-4 h-full">
+                            <div class="shrink-0 mt-1 md:mt-0">
+                                <i data-lucide="cloud" class="h-6 w-6 md:h-12 md:w-12 text-[#D9540D]"></i>
+                            </div>
+                            <div class="flex flex-col gap-0.5 md:gap-1 overflow-hidden">
+                                <h3 class="text-[9px] md:text-lg font-black tracking-tight text-black leading-tight line-clamp-2">Unlimited Usage, Zero Limits</h3>
+                                <p class="text-[8px] md:text-sm text-gray-500 font-medium leading-tight line-clamp-3">Create as many documents or results as you want — no caps, no restrictions. Just pure output, whenever you need it.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="border border-gray-100 shadow-md bg-white rounded-xl md:rounded-[32px] overflow-hidden h-full min-h-[140px] md:min-h-[240px]">
+                        <div class="flex flex-col items-center justify-start p-2 md:p-8 text-center gap-1 md:gap-4 h-full">
+                            <div class="shrink-0 mt-1 md:mt-0">
+                                <i data-lucide="banknote" class="h-6 w-6 md:h-12 md:w-12 text-[#D9540D]"></i>
+                            </div>
+                            <div class="flex flex-col gap-0.5 md:gap-1 overflow-hidden">
+                                <h3 class="text-[9px] md:text-lg font-black tracking-tight text-black leading-tight line-clamp-2">No Per-Use Fees — Pay Once</h3>
+                                <p class="text-[8px] md:text-sm text-gray-500 font-medium leading-tight line-clamp-3">Stop wasting money on every single task.
+One-time purchase gives you lifetime access with zero recurring costs.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="border border-gray-100 shadow-md bg-white rounded-xl md:rounded-[32px] overflow-hidden h-full min-h-[140px] md:min-h-[240px]">
+                        <div class="flex flex-col items-center justify-start p-2 md:p-8 text-center gap-1 md:gap-4 h-full">
+                            <div class="shrink-0 mt-1 md:mt-0">
+                                <i data-lucide="briefcase" class="h-6 w-6 md:h-12 md:w-12 text-[#D9540D]"></i>
+                            </div>
+                            <div class="flex flex-col gap-0.5 md:gap-1 overflow-hidden">
+                                <h3 class="text-[9px] md:text-lg font-black tracking-tight text-black leading-tight line-clamp-2">Complete Control & Privacy</h3>
+                                <p class="text-[8px] md:text-sm text-gray-500 font-medium leading-tight line-clamp-3">No servers. No tracking. No data leaks. Everything runs on your system — fast, secure, and fully under your control.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Capabilities Section -->
+        <section id="capabilities" class="w-full py-4 bg-transparent scroll-mt-24">
+            <div class="container mx-auto px-2 md:px-6 lg:px-12">
+                <div class="max-w-3xl mx-auto mb-16 px-4">
+                    <div class="relative aspect-video rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100">
+                        <iframe loading="lazy" src="https://player.vimeo.com/video/1214831356?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;like=0&amp;share=0&amp;vimeo_logo=0&amp;dnt=1&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="1.2.3"></iframe>
+                    </div>
+                </div>
+
+                <div class="max-w-3xl mx-auto mb-16 px-4">
+                    <div class="relative aspect-video rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100">
+                        <iframe loading="lazy" src="https://player.vimeo.com/video/1214832449?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;like=0&amp;share=0&amp;vimeo_logo=0&amp;dnt=1&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="1.2.3"></iframe>
+                    </div>
+                </div>
+
+                
+                <div class="mt-8 text-center max-w-5xl mx-auto px-1 md:px-4 relative">
+                    <h2 class="text-3xl md:text-4xl font-black text-[#1a202c] mb-10 tracking-tight">Why Choose Ctooz?</h2>
+                    <div class="flex flex-row justify-center gap-1.5 md:gap-8 items-stretch w-full mx-auto">
+                        <!-- Legacy Card -->
+                        <div class="flex-1 bg-white rounded-xl md:rounded-[32px] border border-[#f1f5f9] shadow-[0_10px_40px_rgba(0,0,0,0.06)] md:shadow-[0_25px_60px_rgba(0,0,0,0.1)] overflow-hidden transition-all duration-300 hover:-translate-y-1">
+                            <div class="flex flex-col md:flex-row justify-between items-center p-4 md:p-10 border-b border-[#f1f5f9] gap-2 md:gap-4">
+                                <div class="flex items-center gap-2 md:gap-4">
+                                    <img src="./assets/veriftools-legacy.png" alt="Verif Tools" class="w-7 h-7 md:w-14 md:h-14 rounded-lg md:rounded-2xl object-cover shadow-sm">
+                                    <span class="font-bold text-[#718096] text-[10px] md:text-xl">VERIF TOOLS</span>
+                                </div>
+                                <span class="text-[7px] md:text-[12px] font-extrabold text-[#a0aec0] tracking-[0.5px] md:tracking-[2px] uppercase">LEGACY</span>
+                            </div>
+                            <ul class="text-left divide-y divide-[#f7fafc]">
+                                <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#4a5568] font-medium">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3 md:w-5 md:h-5 mr-2 md:mr-6 text-gray-400 shrink-0"></i>
+                                    <span class="text-[8px] md:text-[16px] leading-tight">Pay-Per-Feature model</span>
+                                </li>
+                                <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#4a5568] font-medium">
+                                    <i data-lucide="shield" class="w-3 h-3 md:w-5 md:h-5 mr-2 md:mr-6 text-gray-400 shrink-0"></i>
+                                    <span class="text-[8px] md:text-[16px] leading-tight">Requires continuous Internet</span>
+                                </li>
+                                <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#4a5568] font-medium">
+                                    <i data-lucide="shield" class="w-3 h-3 md:w-5 md:h-5 mr-2 md:mr-6 text-gray-400 shrink-0"></i>
+                                    <span class="text-[8px] md:text-[16px] leading-tight">Data sent to unknown servers</span>
+                                </li>
+                                <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#4a5568] font-medium">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3 md:w-5 md:h-5 mr-2 md:mr-6 text-gray-400 shrink-0"></i>
+                                    <span class="text-[8px] md:text-[16px] leading-tight">Slow performance</span>
+                                </li>
+                                <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#4a5568] font-medium">
+                                    <i data-lucide="shield" class="w-3 h-3 md:w-5 md:h-5 mr-2 md:mr-6 text-gray-400 shrink-0"></i>
+                                    <span class="text-[8px] md:text-[16px] leading-tight">Limited access</span>
+                                </li>
+                                <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#4a5568] font-medium">
+                                    <i data-lucide="shield" class="w-3 h-3 md:w-5 md:h-5 mr-2 md:mr-6 text-gray-400 shrink-0"></i>
+                                    <span class="text-[8px] md:text-[16px] leading-tight">Limited user control</span>
+                                </li>
+                                <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#4a5568] font-medium">
+                                    <i data-lucide="refresh-cw" class="w-3 h-3 md:w-5 md:h-5 mr-2 md:mr-6 text-gray-400 shrink-0"></i>
+                                    <span class="text-[8px] md:text-[16px] leading-tight">Hidden costs</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- Modern Card -->
+                        <div class="flex-1 bg-white rounded-xl md:rounded-[32px] border border-[#f1f5f9] shadow-[0_10px_40px_rgba(0,0,0,0.06)] md:shadow-[0_25px_60px_rgba(0,0,0,0.1)] transition-all duration-300 hover:-translate-y-1 relative">
+                            <div class="absolute -top-3 md:-top-5 right-2 md:right-8 bg-[#48bb78] text-white px-3 py-1 md:px-6 md:py-2 rounded-full text-[6px] md:text-[12px] font-black uppercase z-20 shadow-lg shadow-green-500/25">BETTER CHOICE</div>
+                            <div class="overflow-hidden rounded-xl md:rounded-[32px]">
+                                <div class="flex flex-col md:flex-row justify-between items-center p-4 md:p-12 border-b border-[#f1f5f9] gap-2 md:gap-4">
+                                    <div class="flex items-center gap-2 md:gap-4">
+                                        <img src="./assets/tooz-icon.png" alt="Ctooz" class="w-7 h-7 md:w-14 md:h-14 rounded-lg md:rounded-2xl object-cover shadow-sm">
+                                        <span class="font-extrabold text-[#2d3748] text-xs md:text-3xl">tooz</span>
+                                    </div>
+                                    <span class="text-[7px] md:text-[12px] font-extrabold text-[#48bb78] tracking-[0.5px] md:tracking-[2px] uppercase">MODERN</span>
+                                </div>
+                                <ul class="text-left divide-y divide-[#f7fafc]">
+                                    <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#2d3748] font-semibold">
+                                        <i data-lucide="file-text" class="w-3 h-3 md:w-6 md:h-6 mr-2 md:mr-6 text-blue-500 shrink-0"></i>
+                                        <span class="text-[8px] md:text-[16px] flex-grow leading-tight">Simple, One-Time payment</span>
+                                    </li>
+                                    <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#2d3748] font-semibold">
+                                        <i data-lucide="shield" class="w-3 h-3 md:w-6 md:h-6 mr-2 md:mr-6 text-teal-500 shrink-0"></i>
+                                        <span class="text-[8px] md:text-[16px] flex-grow leading-tight">Full Offline capabilities</span>
+                                    </li>
+                                    <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#2d3748] font-semibold">
+                                        <i data-lucide="shield" class="w-3 h-3 md:w-6 md:h-6 mr-2 md:mr-6 text-orange-500 shrink-0"></i>
+                                        <span class="text-[8px] md:text-[16px] flex-grow leading-tight">100% data remains local</span>
+                                    </li>
+                                    <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#2d3748] font-semibold">
+                                        <i data-lucide="refresh-cw" class="w-3 h-3 md:w-6 md:h-6 mr-2 md:mr-6 text-red-500 shrink-0"></i>
+                                        <span class="text-[8px] md:text-[16px] flex-grow leading-tight">Max. local performance</span>
+                                    </li>
+                                    <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#2d3748] font-semibold">
+                                        <i data-lucide="shield" class="w-3 h-3 md:w-6 md:h-6 mr-2 md:mr-6 text-blue-600 shrink-0"></i>
+                                        <span class="text-[8px] md:text-[16px] flex-grow leading-tight">Unrestricted tools</span>
+                                    </li>
+                                    <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#2d3748] font-semibold">
+                                        <i data-lucide="shield" class="w-3 h-3 md:w-6 md:h-6 mr-2 md:mr-6 text-red-600 shrink-0"></i>
+                                        <span class="text-[8px] md:text-[16px] flex-grow leading-tight">Total user control</span>
+                                    </li>
+                                    <li class="flex items-center py-3 px-3 md:py-4 md:px-12 text-[#2d3748] font-semibold">
+                                        <i data-lucide="shield" class="w-3 h-3 md:w-6 md:h-6 mr-2 md:mr-6 text-orange-600 shrink-0"></i>
+                                        <span class="text-[8px] md:text-[16px] flex-grow leading-tight">All-inclusive pricing</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="w-full py-6 sm:py-12 bg-transparent scroll-mt-24">
+            <div class="container mx-auto px-4 lg:px-20">
+                <div class="max-w-6xl mx-auto bg-white p-6 sm:p-10 md:p-16 rounded-[20px] shadow-[0_4px_20px_rgba(0,0,0,0.05)] text-center border border-gray-100">
+                    <h1 class="text-2xl sm:text-3xl md:text-[2.2rem] font-bold text-black mb-2 leading-tight">CTOOZ Complete Software Package</h1>
+                    <p class="text-sm sm:text-base text-[#666] mb-6">Powered by VerifTools</p>
+                    <p class="text-base sm:text-lg md:text-[1.1rem] leading-[1.5] text-black font-semibold mb-8 md:mb-10 max-w-4xl mx-auto px-2">
+                        Developed by VerifTools and based on advanced document processing standards, CTOOZ offers a powerful and completely offline solution—designed for speed, privacy, and unlimited scalability.
+                    </p>
+                    <a href="license" class="inline-flex w-full sm:w-auto bg-[#b34002] hover:bg-[#8a2e01] text-white px-8 sm:px-10 py-6 text-sm sm:text-base font-semibold rounded-lg shadow-lg shadow-orange-500/20 transition-all hover:scale-[1.02] active:scale-95 items-center justify-center">Purchase now</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full bg-[#1a1a1a] py-3 mt-12">
+        <div class="container mx-auto px-6 lg:px-12 text-center">
+            <div class="text-gray-500 text-[10px] font-bold tracking-widest uppercase">© 2024 CTOOZ. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- Floating Chat Widget -->
+    <div class="fixed bottom-6 right-6 z-[100] flex flex-col items-center gap-4">
+        <!-- Telegram Link -->
+        <a href="https://t.me/ctooz_com" target="_blank" id="telegram-chat" class="group relative flex items-center justify-center w-14 h-14 bg-white rounded-2xl shadow-[0_15px_30px_rgba(0,0,0,0.15)] border border-gray-100 transition-all duration-500 hover:-translate-y-1 hover:scale-110 active:scale-95">
+            <img src="./assets/telegram-logo.png" alt="Telegram" class="w-8 h-8 object-contain">
+            <!-- Tooltip -->
+            <div class="absolute right-full mr-4 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl">
+                Chat on Telegram
+            </div>
+        </a>
+
+        <!-- Toggle Button -->
+        <button id="chat-toggle" class="flex items-center justify-center w-12 h-12 bg-white/30 backdrop-blur-md border border-white/50 rounded-full shadow-xl transition-all duration-300 hover:scale-110 active:scale-90 group">
+            <i data-lucide="plus" id="toggle-icon" class="w-6 h-6 text-[#D9540D] stroke-[3] transition-transform duration-500"></i>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Chat Widget Logic
+        const chatToggle = document.getElementById('chat-toggle');
+        const telegramChat = document.getElementById('telegram-chat');
+        const toggleIcon = document.getElementById('toggle-icon');
+        let isChatVisible = true;
+
+        // Set initial state (X visible)
+        toggleIcon.style.transform = 'rotate(45deg)';
+
+        chatToggle.addEventListener('click', () => {
+            if (isChatVisible) {
+                // Hide Logo, Rotate to + (0deg)
+                telegramChat.style.opacity = '0';
+                telegramChat.style.transform = 'translateY(20px) scale(0.8)';
+                telegramChat.style.pointerEvents = 'none';
+                toggleIcon.style.transform = 'rotate(0deg)';
+            } else {
+                // Show Logo, Rotate to X (45deg)
+                telegramChat.style.opacity = '1';
+                telegramChat.style.transform = 'translateY(0) scale(1)';
+                telegramChat.style.pointerEvents = 'auto';
+                toggleIcon.style.transform = 'rotate(45deg)';
+            }
+            isChatVisible = !isChatVisible;
+        });
+    </script>
+</body>
+</html>

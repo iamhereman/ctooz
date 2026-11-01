@@ -1,0 +1,65 @@
+:root {
+    --primary: #D9540D;
+    --primary-hover: #C24A0B;
+}
+
+body {
+    background-color: #ffffff;
+    background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+.hero-animation-container {
+    perspective: 1200px;
+}
+
+.hero-doc {
+    position: absolute;
+    transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-style: preserve-3d;
+    width: 10rem; /* balanced size for mobile */
+    height: 12.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    will-change: transform, opacity;
+}
+
+@media (min-width: 1024px) {
+    .hero-doc {
+        width: 250px; /* Base size for desktop */
+        height: 320px;
+    }
+}
+
+.hero-doc img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+}
+
+.dot-pattern {
+    background-image: radial-gradient(#e5e7eb 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
