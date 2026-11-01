@@ -7,7 +7,7 @@ class AddressPoolManager {
      * Gets or derives an available Bitcoin address from the pool.
      * Reuses expired/free addresses to bypass the 20-address gap limit.
      */
-    public static function acquire_address($order_id, $expiry_minutes = 15) {
+    public static function acquire_address($order_id, $expiry_minutes = 30) {
         $pdo = get_db_connection();
         $now = date('Y-m-d H:i:s');
         $expires_at = date('Y-m-d H:i:s', time() + ($expiry_minutes * 60));
