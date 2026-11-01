@@ -72,6 +72,13 @@ try {
     $expected_sats = (int)round(($price_usd / $rate) * 100000000);
     $expected_btc = sprintf('%.8f', $expected_sats / 100000000);
 
+    // Tolerance and minimum acceptable sats
+    $tolerance_pct = defined('ALLOWED_UNDERPAYMENT_PERCENTAGE') ? (float)ALLOWED_UNDERPAYMENT_PERCENTAGE : 1.5;
+    $min_acceptable_sats = (int)round($expected_sats * (1 - ($tolerance_pct / 100)));
+    if ($price_usd <= 1.00 && $expected_sats <= 2500) {
+        $min_acceptable_sats = min($min_acceptable_sats, 1000);
+    }
+
     // Acquire address from pool (reuses expired address to bypass 20 gap limit)
     $pool_item = AddressPoolManager::acquire_address($order_id, ORDER_EXPIRY_MINUTES);
     $btc_address = $pool_item['address'];
@@ -107,6 +114,8 @@ try {
         'priceUsd' => $price_usd,
         'btcAmount' => $expected_btc,
         'sats' => $expected_sats,
+        'minimumAcceptableSats' => $min_acceptable_sats,
+        'tolerancePercentage' => $tolerance_pct,
         'rate' => $rate,
         'address' => $btc_address,
         'derivationIndex' => $derivation_index,
