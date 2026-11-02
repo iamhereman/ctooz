@@ -57,12 +57,12 @@ try {
         exit;
     }
 
-    // Price can be 499 (standard product) or 1 (sample test)
-    $price_usd = isset($input['amount']) && is_numeric($input['amount']) && $input['amount'] > 0
-        ? (float)$input['amount']
-        : PRODUCT_PRICE_USD;
-
-    $product_name = $price_usd <= 1.00 ? 'CTOOZ $1 Test Verification' : 'CTOOZ Lifetime License';
+    // BUG #5 FIX: Strict server-side pricing control!
+    // Never trust client-supplied amount float.
+    // Only standard license ($499) or verified sample test ($1.00) if explicitly flagged.
+    $is_sample = (!empty($input['sample']) && $input['sample'] === true) || (isset($input['type']) && $input['type'] === 'sample');
+    $price_usd = $is_sample ? 1.00 : PRODUCT_PRICE_USD;
+    $product_name = $is_sample ? 'CTOOZ $1 Test Verification' : 'CTOOZ Lifetime License';
 
     // Unique Order ID
     $order_id = 'CTZ-' . strtoupper(substr(bin2hex(random_bytes(6)), 0, 10));
