@@ -164,7 +164,7 @@
                         const res = await fetch('/checkout.php', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: email, amount: 1.00 })
+                            body: JSON.stringify({ email: email, sample: true })
                         });
                         const data = await res.json();
 
