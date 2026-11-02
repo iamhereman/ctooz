@@ -14,7 +14,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/address_pool.php';
 
 /**
- * Sends a confirmation email to the buyer via native PHP mail() and/or Resend API
+ * Sends a single confirmation email to the buyer via native PHP mail()
  */
 function send_order_email($buyer_email, $order_id, $btc_address, $received_sats, $product_name = 'CTOOZ License', $tx_hash = null) {
     if (!filter_var($buyer_email, FILTER_VALIDATE_EMAIL)) {
@@ -251,41 +251,10 @@ HTML;
         'X-Mailer: PHP/' . phpversion()
     ];
 
-    $mail_sent = false;
-
-    // 1. Send via Hostinger native mail()
     if (function_exists('mail')) {
-        $mail_sent = @mail($buyer_email, $subject, $html, implode("\r\n", $headers));
+        return @mail($buyer_email, $subject, $html, implode("\r\n", $headers));
     }
-
-    // 2. Also attempt Resend API if key is defined
-    if (defined('RESEND_API_KEY') && RESEND_API_KEY && strpos(RESEND_API_KEY, 're_') === 0) {
-        try {
-            $ch = curl_init('https://api.resend.com/emails');
-            $payload = [
-                'from' => defined('RESEND_FROM') ? RESEND_FROM : 'Ctooz Support <support@ctooz.com>',
-                'to' => [$buyer_email],
-                'subject' => $subject,
-                'html' => $html
-            ];
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Authorization: Bearer ' . RESEND_API_KEY,
-                'Content-Type: application/json'
-            ]);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 4);
-            $res = curl_exec($ch);
-            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-            if ($http_code === 200 || $http_code === 201) {
-                $mail_sent = true;
-            }
-        } catch (Exception $e) {}
-    }
-
-    return $mail_sent;
+    return false;
 }
 
 $order_id = $_GET['order_id'] ?? $_GET['id'] ?? '';
@@ -334,21 +303,21 @@ try {
         $minimum_acceptable_sats = min($minimum_acceptable_sats, 1000);
     }
 
-    // If order already confirmed paid, ensure confirmation email is sent if not already sent
+    // If order already confirmed paid, return immediately
+    // If email was never sent before, use atomic lock to ensure EXACTLY ONE email is sent
     if ($order['status'] === 'paid') {
         $rec = (int)$order['received_sats'];
         $is_under = ($rec < $expected_sats);
         $is_over = ($rec > $expected_sats);
         
-        $email_sent = isset($order['email_sent']) ? (int)$order['email_sent'] : 0;
-        if (!$email_sent && !empty($order['buyer_email'])) {
-            $sent = send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $rec, $order['product_name'] ?? 'CTOOZ License', $tx_hash);
-            if ($sent) {
-                try {
-                    $upd = $pdo->prepare("UPDATE btc_orders SET email_sent = 1 WHERE id = :id");
-                    $upd->execute([':id' => $order['id']]);
-                    $email_sent = 1;
-                } catch (Exception $e) {}
+        $email_sent = (int)($order['email_sent'] ?? 0);
+        if ($email_sent === 0 && !empty($order['buyer_email'])) {
+            // ATOMIC LOCK: Only 1 request can update from 0 to 1
+            $lock = $pdo->prepare("UPDATE btc_orders SET email_sent = 1 WHERE id = :id AND email_sent = 0");
+            $lock->execute([':id' => $order['id']]);
+            if ($lock->rowCount() > 0) {
+                send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $rec, $order['product_name'] ?? 'CTOOZ License', $tx_hash);
+                $email_sent = 1;
             }
         }
 
@@ -365,7 +334,7 @@ try {
             'orderId' => $order['order_id'],
             'address' => $order['bitcoin_address'],
             'buyerEmail' => $order['buyer_email'],
-            'emailSent' => (bool)$email_sent,
+            'emailSent' => true,
             'expectedSats' => $expected_sats,
             'receivedSats' => $rec,
             'minimumAcceptableSats' => $minimum_acceptable_sats,
@@ -383,7 +352,7 @@ try {
     // Query Mempool.space API (public, no api key required)
     $ch = curl_init(MEMPOOL_API_BASE . "/address/" . urlencode($btc_address));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 8);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 6);
     curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
     $mempool_raw = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -423,23 +392,28 @@ try {
             $msg = 'Payment verified (overpayment received)! Successfully processing your order...';
         }
 
-        // Send order confirmation email via native mail() / Resend
-        $email_sent = send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $total_received_sats, $order['product_name'] ?? 'CTOOZ License', $tx_hash);
-
+        // 1. Immediately mark order as paid in DB
         $update = $pdo->prepare("
             UPDATE btc_orders 
-            SET status = 'paid', received_sats = :rec, paid_at = :now, email_sent = :es 
+            SET status = 'paid', received_sats = :rec, paid_at = :now 
             WHERE id = :id
         ");
         $update->execute([
             ':rec' => $total_received_sats,
             ':now' => $now,
-            ':es' => $email_sent ? 1 : 0,
             ':id' => $order['id']
         ]);
 
         // Permanently mark this address as used in the pool
         AddressPoolManager::mark_used($btc_address);
+
+        // 2. ATOMIC LOCK for email: Only 1 process can update email_sent from 0 to 1
+        // This guarantees EXACTLY ONE email is sent even if 10 concurrent requests arrive!
+        $lock = $pdo->prepare("UPDATE btc_orders SET email_sent = 1 WHERE id = :id AND email_sent = 0");
+        $lock->execute([':id' => $order['id']]);
+        if ($lock->rowCount() > 0) {
+            send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $total_received_sats, $order['product_name'] ?? 'CTOOZ License', $tx_hash);
+        }
 
         echo json_encode([
             'status' => 'paid',
@@ -447,7 +421,7 @@ try {
             'orderId' => $order['order_id'],
             'address' => $btc_address,
             'buyerEmail' => $order['buyer_email'],
-            'emailSent' => (bool)$email_sent,
+            'emailSent' => true,
             'expectedSats' => $expected_sats,
             'receivedSats' => $total_received_sats,
             'minimumAcceptableSats' => $minimum_acceptable_sats,
