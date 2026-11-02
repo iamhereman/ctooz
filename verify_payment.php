@@ -257,32 +257,103 @@ HTML;
     return false;
 }
 
-$order_id = $_GET['order_id'] ?? $_GET['id'] ?? '';
-$address = $_GET['address'] ?? '';
+/**
+ * Masks buyer email for privacy protection in public responses
+ * e.g. "iamhereman@gmail.com" -> "i****n@gmail.com"
+ */
+function mask_email($email) {
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return '***@***.com';
+    }
+    $parts = explode('@', $email, 2);
+    $name = $parts[0];
+    $domain = $parts[1];
+    $len = strlen($name);
+    if ($len <= 2) {
+        $masked_name = substr($name, 0, 1) . '***';
+    } else {
+        $masked_name = substr($name, 0, 1) . str_repeat('*', min(4, $len - 2)) . substr($name, -1);
+    }
+    return $masked_name . '@' . $domain;
+}
 
-if (!$order_id && !$address) {
+/**
+ * Fetches real 64-character Bitcoin blockchain transaction ID (TxID) from Mempool.space
+ */
+function fetch_mempool_txid($btc_address) {
+    $ch = curl_init(MEMPOOL_API_BASE . "/address/" . urlencode($btc_address) . "/txs");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 6);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0');
+    $raw = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($http_code === 200 && $raw) {
+        $txs = json_decode($raw, true);
+        if (is_array($txs) && !empty($txs[0]['txid'])) {
+            return $txs[0]['txid'];
+        }
+    }
+    return null;
+}
+
+$query = trim($_GET['q'] ?? $_GET['query'] ?? $_GET['txInput'] ?? '');
+$order_id = trim($_GET['order_id'] ?? $_GET['id'] ?? '');
+$address = trim($_GET['address'] ?? '');
+$txid = trim($_GET['txid'] ?? $_GET['hash'] ?? '');
+
+if ($query) {
+    if (strpos($query, 'CTZ-') === 0) {
+        $order_id = $query;
+    } elseif (strlen($query) === 64 && ctype_xdigit($query)) {
+        $txid = $query;
+    } else {
+        $address = $query;
+    }
+}
+
+// In case frontend passed both order_id and address as the same search string
+if ($order_id && $address && $order_id === $address) {
+    $search_val = $order_id;
+    if (strpos($search_val, 'CTZ-') === 0) {
+        $address = '';
+    } elseif (strlen($search_val) === 64 && ctype_xdigit($search_val)) {
+        $txid = $search_val;
+        $order_id = '';
+        $address = '';
+    } else {
+        $order_id = '';
+    }
+}
+
+if (!$order_id && !$address && !$txid) {
     http_response_code(400);
-    echo json_encode(['error' => 'Missing order_id or address parameter']);
+    echo json_encode(['error' => 'Missing order_id, address, or txid parameter']);
     exit;
 }
 
 try {
     $pdo = get_db_connection();
 
-    // Ensure email_sent column exists
-    try {
-        $pdo->exec("ALTER TABLE btc_orders ADD COLUMN email_sent INTEGER DEFAULT 0");
-    } catch (Exception $e) {}
-
+    // Query order by Order ID, TxID, or Bitcoin Address
+    $order = null;
     if ($order_id) {
         $stmt = $pdo->prepare("SELECT * FROM btc_orders WHERE order_id = :oid LIMIT 1");
         $stmt->execute([':oid' => $order_id]);
-    } else {
+        $order = $stmt->fetch();
+    }
+    if (!$order && $txid) {
+        $stmt = $pdo->prepare("SELECT * FROM btc_orders WHERE txid = :txid ORDER BY id DESC LIMIT 1");
+        $stmt->execute([':txid' => $txid]);
+        $order = $stmt->fetch();
+    }
+    if (!$order && $address) {
         $stmt = $pdo->prepare("SELECT * FROM btc_orders WHERE bitcoin_address = :addr ORDER BY id DESC LIMIT 1");
         $stmt->execute([':addr' => $address]);
+        $order = $stmt->fetch();
     }
 
-    $order = $stmt->fetch();
     if (!$order) {
         http_response_code(404);
         echo json_encode(['error' => 'Order not found']);
@@ -292,6 +363,18 @@ try {
     $expected_sats = (int)$order['expected_sats'];
     $price_usd = (float)$order['price_usd'];
     $btc_address = $order['bitcoin_address'];
+
+    // Try fetching real blockchain TxID if not yet recorded
+    if (empty($order['txid'])) {
+        $real_txid = fetch_mempool_txid($btc_address);
+        if ($real_txid) {
+            $order['txid'] = $real_txid;
+            try {
+                $up = $pdo->prepare("UPDATE btc_orders SET txid = :txid WHERE id = :id");
+                $up->execute([':txid' => $real_txid, ':id' => $order['id']]);
+            } catch (Exception $e) {}
+        }
+    }
     $tx_hash = !empty($order['txid']) ? $order['txid'] : $order['order_id'];
 
     // Rule 1 & Rule 2: Tolerance Percentage & Minimum Acceptable Sats calculation
@@ -333,7 +416,8 @@ try {
             'settled' => true,
             'orderId' => $order['order_id'],
             'address' => $order['bitcoin_address'],
-            'buyerEmail' => $order['buyer_email'],
+            'buyerEmail' => mask_email($order['buyer_email']),
+            'txid' => $tx_hash,
             'emailSent' => true,
             'expectedSats' => $expected_sats,
             'receivedSats' => $rec,
@@ -365,6 +449,8 @@ try {
             'settled' => false,
             'orderId' => $order['order_id'],
             'address' => $btc_address,
+            'buyerEmail' => mask_email($order['buyer_email']),
+            'txid' => $tx_hash,
             'expectedSats' => $expected_sats,
             'receivedSats' => (int)$order['received_sats']
         ]);
@@ -392,15 +478,24 @@ try {
             $msg = 'Payment verified (overpayment received)! Successfully processing your order...';
         }
 
+        // Try to fetch real 64-char transaction hash if we haven't already
+        if ($tx_hash === $order['order_id']) {
+            $real_txid = fetch_mempool_txid($btc_address);
+            if ($real_txid) {
+                $tx_hash = $real_txid;
+            }
+        }
+
         // 1. Immediately mark order as paid in DB
         $update = $pdo->prepare("
             UPDATE btc_orders 
-            SET status = 'paid', received_sats = :rec, paid_at = :now 
+            SET status = 'paid', received_sats = :rec, paid_at = :now, txid = :txid
             WHERE id = :id
         ");
         $update->execute([
             ':rec' => $total_received_sats,
             ':now' => $now,
+            ':txid' => $tx_hash,
             ':id' => $order['id']
         ]);
 
@@ -420,7 +515,8 @@ try {
             'settled' => true,
             'orderId' => $order['order_id'],
             'address' => $btc_address,
-            'buyerEmail' => $order['buyer_email'],
+            'buyerEmail' => mask_email($order['buyer_email']),
+            'txid' => $tx_hash,
             'emailSent' => true,
             'expectedSats' => $expected_sats,
             'receivedSats' => $total_received_sats,
@@ -439,8 +535,11 @@ try {
 
     // Partial Payment: Received some sats, but below minimum acceptable threshold
     if ($total_received_sats > 0) {
-        $update = $pdo->prepare("UPDATE btc_orders SET received_sats = :rec WHERE id = :id");
-        $update->execute([':rec' => $total_received_sats, ':id' => $order['id']]);
+        // Permanently retire address in pool so it is NEVER reused for another customer!
+        AddressPoolManager::mark_used($btc_address);
+
+        $update = $pdo->prepare("UPDATE btc_orders SET received_sats = :rec, txid = :txid WHERE id = :id");
+        $update->execute([':rec' => $total_received_sats, ':txid' => $tx_hash, ':id' => $order['id']]);
 
         $due_sats = $expected_sats - $total_received_sats;
 
@@ -449,7 +548,8 @@ try {
             'settled' => false,
             'orderId' => $order['order_id'],
             'address' => $btc_address,
-            'buyerEmail' => $order['buyer_email'],
+            'buyerEmail' => mask_email($order['buyer_email']),
+            'txid' => $tx_hash,
             'expectedSats' => $expected_sats,
             'minimumAcceptableSats' => $minimum_acceptable_sats,
             'tolerancePercentage' => $tolerance_percentage,
@@ -470,7 +570,8 @@ try {
             'settled' => false,
             'orderId' => $order['order_id'],
             'address' => $btc_address,
-            'buyerEmail' => $order['buyer_email'],
+            'buyerEmail' => mask_email($order['buyer_email']),
+            'txid' => $tx_hash,
             'expectedSats' => $expected_sats,
             'receivedSats' => 0,
             'message' => 'Order window expired. Please generate a new invoice.'
@@ -483,7 +584,8 @@ try {
         'settled' => false,
         'orderId' => $order['order_id'],
         'address' => $btc_address,
-        'buyerEmail' => $order['buyer_email'],
+        'buyerEmail' => mask_email($order['buyer_email']),
+        'txid' => $tx_hash,
         'expectedSats' => $expected_sats,
         'minimumAcceptableSats' => $minimum_acceptable_sats,
         'receivedSats' => 0,
