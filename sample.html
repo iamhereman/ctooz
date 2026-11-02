@@ -68,7 +68,16 @@
                 <span>Pay $1 via Bitcoin</span>
             </button>
 
-            <div class="text-center">
+            <!-- Manual Verification Box -->
+            <div class="mt-4 pt-4 border-t border-slate-100 space-y-2 text-left">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-slate-400">Already paid? Check Order ID / BTC Address</label>
+                <div class="flex gap-2">
+                    <input id="standalone-txid" type="text" placeholder="Order ID or BTC Address" class="flex-1 h-9 px-3 rounded-lg border border-slate-200 text-xs font-mono focus:outline-none focus:border-[#D9540D]">
+                    <button onclick="verifyStandaloneTx()" class="h-9 px-3 bg-slate-800 hover:bg-black text-white text-[10px] font-bold rounded-lg uppercase transition-all">Verify</button>
+                </div>
+            </div>
+
+            <div class="text-center pt-2">
                 <a href="./" class="text-[11px] font-bold text-slate-400 hover:text-slate-700 uppercase tracking-widest">Back to Homepage</a>
             </div>
         </div>
@@ -302,8 +311,13 @@
                 modalHeader.innerHTML = `<h2 class="text-lg font-black text-green-600 uppercase">Payment Confirmed!</h2><p class="text-[9px] text-slate-500 font-bold uppercase">${subMessage}</p>`;
             }
 
+            // Save order ID and email for success portal
+            if (data.orderId) localStorage.setItem('last_order_id', data.orderId);
+            const emailInput = document.getElementById('email-input');
+            if (emailInput && emailInput.value) localStorage.setItem('user_email', emailInput.value.trim());
+
+            // Smooth direct redirect to success page
             setTimeout(() => {
-                alert("🎉 SUCCESS! $1 Bitcoin payment was verified! Redirecting to success page...");
                 window.location.href = 'success';
             }, 1800);
         }
@@ -327,6 +341,36 @@
             } catch (e) {
                 if (statusText) statusText.innerText = 'Error checking status.';
             }
+        }
+
+        // Standalone Verification (For TxID, Order ID, or Bitcoin Address)
+        async function verifyStandaloneTx() {
+            const txInput = document.getElementById('standalone-txid').value.trim();
+            if (!txInput) {
+                alert("Please enter a Bitcoin Address or Order ID.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/verify_payment.php?order_id=${encodeURIComponent(txInput)}&address=${encodeURIComponent(txInput)}`);
+                const data = await res.json();
+                if (data.status === 'paid' || data.settled) {
+                    if (data.underpayment_tolerated || data.isUnderpaidTolerated) {
+                        alert("Payment detected with slight fee deduction, successfully processing your order...");
+                    } else {
+                        alert("Bitcoin Payment Verified! Redirecting to success page...");
+                    }
+                    window.location.href = 'success';
+                    return;
+                } else if (data.status === 'partial') {
+                    alert(`Partial payment detected: ${data.receivedSats} Sats received. Still due: ${data.dueSats} Sats.`);
+                    return;
+                }
+            } catch (e) {
+                console.warn(e);
+            }
+
+            alert("Address/Order checked. Payment is pending or awaiting confirmation on Bitcoin network.");
         }
     </script>
 </body>
