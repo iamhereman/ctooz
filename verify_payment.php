@@ -14,19 +14,20 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/address_pool.php';
 
 /**
- * Sends a confirmation email to the buyer via Resend API
+ * Sends a confirmation email to the buyer via native PHP mail() and/or Resend API
  */
-function send_order_email($buyer_email, $order_id, $btc_address, $received_sats) {
-    if (!defined('RESEND_API_KEY') || !RESEND_API_KEY || !filter_var($buyer_email, FILTER_VALIDATE_EMAIL)) {
+function send_order_email($buyer_email, $order_id, $btc_address, $received_sats, $product_name = 'CTOOZ License') {
+    if (!filter_var($buyer_email, FILTER_VALIDATE_EMAIL)) {
         return false;
     }
-    try {
-        $ch = curl_init('https://api.resend.com/emails');
-        $from = defined('RESEND_FROM') ? RESEND_FROM : 'Ctooz Support <support@ctooz.com>';
-        $download_link = defined('DOWNLOAD_LINK') ? DOWNLOAD_LINK : 'https://ctooz.com/success';
-        $formatted_sats = number_format($received_sats);
-        
-        $html = <<<HTML
+
+    $from_email = 'support@ctooz.com';
+    $from_name = 'CTOOZ Support';
+    $download_link = defined('DOWNLOAD_LINK') ? DOWNLOAD_LINK : 'https://ctooz.com/success';
+    $formatted_sats = number_format($received_sats);
+    $subject = 'Transaction Confirmed - Your ' . $product_name . ' Details & Access';
+
+    $html = <<<HTML
 <!DOCTYPE html>
 <html>
 <body style="font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 20px;">
@@ -38,7 +39,7 @@ function send_order_email($buyer_email, $order_id, $btc_address, $received_sats)
       <h2 style="color: #1a202c; font-size: 18px; margin-top: 0;">Payment Confirmed - Order Access Ready</h2>
       <p style="color: #4a5568; font-size: 14px; line-height: 1.6;">Hello,</p>
       <p style="color: #4a5568; font-size: 14px; line-height: 1.6;">
-        We have successfully verified your Bitcoin payment on the blockchain! Your access and license details are ready.
+        We have successfully verified your Bitcoin payment on the blockchain for <strong>{$product_name}</strong>! Your access and license details are ready.
       </p>
       <div style="text-align: center; margin: 25px 0;">
         <a href="{$download_link}" style="background: #D9540D; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block;">
@@ -59,27 +60,49 @@ function send_order_email($buyer_email, $order_id, $btc_address, $received_sats)
 </html>
 HTML;
 
-        $payload = [
-            'from' => $from,
-            'to' => [$buyer_email],
-            'subject' => 'Transaction Confirmed - Your CTOOZ License Access and Details',
-            'html' => $html
-        ];
+    $headers = [
+        'MIME-Version: 1.0',
+        'Content-Type: text/html; charset=UTF-8',
+        'From: ' . $from_name . ' <' . $from_email . '>',
+        'Reply-To: ' . $from_email,
+        'X-Mailer: PHP/' . phpversion()
+    ];
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Authorization: Bearer ' . RESEND_API_KEY,
-            'Content-Type: application/json'
-        ]);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        $res = curl_exec($ch);
-        curl_close($ch);
-        return true;
-    } catch (Exception $e) {
-        return false;
+    $mail_sent = false;
+
+    // 1. Send via Hostinger native mail()
+    if (function_exists('mail')) {
+        $mail_sent = @mail($buyer_email, $subject, $html, implode("\r\n", $headers));
     }
+
+    // 2. Also attempt Resend API if key is defined
+    if (defined('RESEND_API_KEY') && RESEND_API_KEY && strpos(RESEND_API_KEY, 're_') === 0) {
+        try {
+            $ch = curl_init('https://api.resend.com/emails');
+            $payload = [
+                'from' => defined('RESEND_FROM') ? RESEND_FROM : 'Ctooz Support <support@ctooz.com>',
+                'to' => [$buyer_email],
+                'subject' => $subject,
+                'html' => $html
+            ];
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Authorization: Bearer ' . RESEND_API_KEY,
+                'Content-Type: application/json'
+            ]);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+            $res = curl_exec($ch);
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            if ($http_code === 200 || $http_code === 201) {
+                $mail_sent = true;
+            }
+        } catch (Exception $e) {}
+    }
+
+    return $mail_sent;
 }
 
 $order_id = $_GET['order_id'] ?? $_GET['id'] ?? '';
@@ -93,6 +116,11 @@ if (!$order_id && !$address) {
 
 try {
     $pdo = get_db_connection();
+
+    // Ensure email_sent column exists
+    try {
+        $pdo->exec("ALTER TABLE btc_orders ADD COLUMN email_sent INTEGER DEFAULT 0");
+    } catch (Exception $e) {}
 
     if ($order_id) {
         $stmt = $pdo->prepare("SELECT * FROM btc_orders WHERE order_id = :oid LIMIT 1");
@@ -122,12 +150,24 @@ try {
         $minimum_acceptable_sats = min($minimum_acceptable_sats, 1000);
     }
 
-    // If order already confirmed paid, return immediately
+    // If order already confirmed paid, ensure confirmation email is sent if not already sent
     if ($order['status'] === 'paid') {
         $rec = (int)$order['received_sats'];
         $is_under = ($rec < $expected_sats);
         $is_over = ($rec > $expected_sats);
         
+        $email_sent = isset($order['email_sent']) ? (int)$order['email_sent'] : 0;
+        if (!$email_sent && !empty($order['buyer_email'])) {
+            $sent = send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $rec, $order['product_name'] ?? 'CTOOZ License');
+            if ($sent) {
+                try {
+                    $upd = $pdo->prepare("UPDATE btc_orders SET email_sent = 1 WHERE id = :id");
+                    $upd->execute([':id' => $order['id']]);
+                    $email_sent = 1;
+                } catch (Exception $e) {}
+            }
+        }
+
         $msg = 'Payment confirmed on Bitcoin blockchain!';
         if ($is_under) {
             $msg = 'Payment detected with slight fee deduction, successfully processing your order...';
@@ -140,6 +180,8 @@ try {
             'settled' => true,
             'orderId' => $order['order_id'],
             'address' => $order['bitcoin_address'],
+            'buyerEmail' => $order['buyer_email'],
+            'emailSent' => (bool)$email_sent,
             'expectedSats' => $expected_sats,
             'receivedSats' => $rec,
             'minimumAcceptableSats' => $minimum_acceptable_sats,
@@ -197,28 +239,31 @@ try {
             $msg = 'Payment verified (overpayment received)! Successfully processing your order...';
         }
 
+        // Send order confirmation email via native mail() / Resend
+        $email_sent = send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $total_received_sats, $order['product_name'] ?? 'CTOOZ License');
+
         $update = $pdo->prepare("
             UPDATE btc_orders 
-            SET status = 'paid', received_sats = :rec, paid_at = :now 
+            SET status = 'paid', received_sats = :rec, paid_at = :now, email_sent = :es 
             WHERE id = :id
         ");
         $update->execute([
             ':rec' => $total_received_sats,
             ':now' => $now,
+            ':es' => $email_sent ? 1 : 0,
             ':id' => $order['id']
         ]);
 
         // Permanently mark this address as used in the pool
         AddressPoolManager::mark_used($btc_address);
 
-        // Send order confirmation email via Resend
-        send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $total_received_sats);
-
         echo json_encode([
             'status' => 'paid',
             'settled' => true,
             'orderId' => $order['order_id'],
             'address' => $btc_address,
+            'buyerEmail' => $order['buyer_email'],
+            'emailSent' => (bool)$email_sent,
             'expectedSats' => $expected_sats,
             'receivedSats' => $total_received_sats,
             'minimumAcceptableSats' => $minimum_acceptable_sats,
@@ -246,6 +291,7 @@ try {
             'settled' => false,
             'orderId' => $order['order_id'],
             'address' => $btc_address,
+            'buyerEmail' => $order['buyer_email'],
             'expectedSats' => $expected_sats,
             'minimumAcceptableSats' => $minimum_acceptable_sats,
             'tolerancePercentage' => $tolerance_percentage,
@@ -266,6 +312,7 @@ try {
             'settled' => false,
             'orderId' => $order['order_id'],
             'address' => $btc_address,
+            'buyerEmail' => $order['buyer_email'],
             'expectedSats' => $expected_sats,
             'receivedSats' => 0,
             'message' => 'Order window expired. Please generate a new invoice.'
@@ -278,6 +325,7 @@ try {
         'settled' => false,
         'orderId' => $order['order_id'],
         'address' => $btc_address,
+        'buyerEmail' => $order['buyer_email'],
         'expectedSats' => $expected_sats,
         'minimumAcceptableSats' => $minimum_acceptable_sats,
         'receivedSats' => 0,
