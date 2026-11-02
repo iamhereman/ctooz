@@ -230,6 +230,7 @@
         let statusPollingInterval = null;
         let countdownInterval = null;
         let expiryTimestamp = null;
+        let isPaymentSettled = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -340,14 +341,19 @@
 
         function startStatusPolling() {
             stopStatusPolling();
-            if (!currentOrderId) return;
+            if (!currentOrderId || isPaymentSettled) return;
 
             statusPollingInterval = setInterval(async () => {
+                if (isPaymentSettled) {
+                    stopStatusPolling();
+                    return;
+                }
                 try {
                     const res = await fetch(`/verify_payment.php?order_id=${currentOrderId}`);
                     const data = await res.json();
                     
                     if (data.status === 'paid' || data.settled) {
+                        isPaymentSettled = true;
                         stopStatusPolling();
                         stopCountdown();
                         onPaymentSuccess(data);
@@ -365,7 +371,7 @@
                 } catch (e) {
                     console.warn('Status poll error:', e);
                 }
-            }, 3000);
+            }, 4000);
         }
 
         function stopStatusPolling() {
