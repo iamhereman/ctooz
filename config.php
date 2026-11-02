@@ -8,9 +8,7 @@ define('ORDER_EXPIRY_MINUTES', 30); // 30 minutes QR expiration window
 define('ALLOWED_UNDERPAYMENT_PERCENTAGE', 1.5); // Allow up to 1.5% fee / underpayment tolerance
 define('MEMPOOL_API_BASE', 'https://mempool.space/api');
 
-// Email Notifications (via Resend)
-define('RESEND_API_KEY', 're_ByLWgbEk_PpKVYAhqqnBfEQ1wjnjeitgv');
-define('RESEND_FROM', 'Ctooz Support <support@ctooz.com>');
+// Email Notifications
 define('DOWNLOAD_LINK', 'https://ctooz.com/success');
 
 // Database Configuration: Uses SQLite by default for zero-setup, or MySQL if configured
@@ -74,6 +72,7 @@ function init_sqlite_db($pdo) {
             derivation_index INTEGER NOT NULL,
             received_sats INTEGER NOT NULL DEFAULT 0,
             txid TEXT DEFAULT NULL,
+            email_sent INTEGER NOT NULL DEFAULT 0,
             status TEXT NOT NULL DEFAULT 'pending',
             expires_at DATETIME NOT NULL,
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -81,5 +80,10 @@ function init_sqlite_db($pdo) {
         );
         CREATE INDEX IF NOT EXISTS idx_orders_addr ON btc_orders (bitcoin_address);
         CREATE INDEX IF NOT EXISTS idx_orders_status ON btc_orders (status);
+        CREATE INDEX IF NOT EXISTS idx_orders_txid ON btc_orders (txid);
     ");
+
+    try {
+        $pdo->exec("ALTER TABLE btc_orders ADD COLUMN email_sent INTEGER DEFAULT 0");
+    } catch (Exception $e) {}
 }
