@@ -16,44 +16,227 @@ require_once __DIR__ . '/address_pool.php';
 /**
  * Sends a confirmation email to the buyer via native PHP mail() and/or Resend API
  */
-function send_order_email($buyer_email, $order_id, $btc_address, $received_sats, $product_name = 'CTOOZ License') {
+function send_order_email($buyer_email, $order_id, $btc_address, $received_sats, $product_name = 'CTOOZ License', $tx_hash = null) {
     if (!filter_var($buyer_email, FILTER_VALIDATE_EMAIL)) {
         return false;
     }
 
+    if (empty($tx_hash)) {
+        $tx_hash = $order_id;
+    }
+    $safe_tx_hash = htmlspecialchars($tx_hash);
+
     $from_email = 'support@ctooz.com';
     $from_name = 'CTOOZ Support';
-    $download_link = defined('DOWNLOAD_LINK') ? DOWNLOAD_LINK : 'https://ctooz.com/success';
-    $formatted_sats = number_format($received_sats);
     $subject = 'Transaction Confirmed - Your ' . $product_name . ' Details & Access';
 
     $html = <<<HTML
 <!DOCTYPE html>
 <html>
-<body style="font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 20px;">
-  <div style="max-width: 560px; margin: 20px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #edf2f7;">
-    <div style="background: #1a202c; padding: 24px 30px;">
-      <h1 style="color: #ffffff; font-size: 22px; margin: 0; letter-spacing: 1px;">CTOOZ</h1>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body, table, td, p, a, div {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+  body {
+    background-color: #f4f6f9;
+    padding: 24px 12px;
+  }
+  .email-container {
+    max-width: 580px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
+    border: 1px solid #e9edf2;
+  }
+  .header {
+    background: #D9540D;
+    border-bottom: 4px solid #B84308;
+    padding: 26px 30px;
+  }
+  .header h1 {
+    color: #ffffff;
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    margin: 0;
+    text-transform: uppercase;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  }
+  .header .tagline {
+    color: rgba(255,255,255,0.85);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+  .content {
+    padding: 34px 30px 30px 30px;
+  }
+  .content h2 {
+    color: #1a202c;
+    font-size: 21px;
+    font-weight: 700;
+    margin: 0 0 18px 0;
+    line-height: 1.3;
+    letter-spacing: -0.2px;
+  }
+  .content p {
+    color: #4a5568;
+    font-size: 15px;
+    margin: 0 0 18px 0;
+    line-height: 1.75;
+  }
+  .content p:last-child {
+    margin-bottom: 0;
+  }
+  .hash-box {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid #D9540D;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin: 22px 0 26px 0;
+    word-break: break-all;
+  }
+  .hash-box .label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #2d3748;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 7px;
+    display: block;
+  }
+  .hash-box .value {
+    font-family: Courier New, Courier, monospace;
+    font-size: 14px;
+    color: #1a202c;
+    line-height: 1.55;
+  }
+  .note {
+    background: #fffaf0;
+    border-left: 4px solid #DD6B20;
+    padding: 15px 18px;
+    margin: 22px 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: #7b341e;
+    line-height: 1.65;
+  }
+  .note strong {
+    color: #9c4221;
+  }
+  .divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 26px 0;
+  }
+  .footer {
+    background: #f7fafc;
+    padding: 18px 30px;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+  }
+  .footer p {
+    font-size: 12px;
+    color: #a0aec0;
+    margin: 0;
+    letter-spacing: 0.2px;
+  }
+  @media only screen and (max-width: 480px) {
+    body {
+      padding: 12px 6px;
+    }
+    .header {
+      padding: 20px 20px;
+    }
+    .header h1 {
+      font-size: 20px;
+      letter-spacing: 3px;
+    }
+    .header .tagline {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+    }
+    .content {
+      padding: 24px 18px 22px 18px;
+    }
+    .content h2 {
+      font-size: 18px;
+    }
+    .content p {
+      font-size: 14px;
+    }
+    .hash-box {
+      padding: 13px 14px;
+    }
+    .hash-box .value {
+      font-size: 13px;
+    }
+    .note {
+      padding: 12px 14px;
+      font-size: 13px;
+    }
+    .footer {
+      padding: 14px 18px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="header">
+      <h1>CTOOZ</h1>
+      <div class="tagline">Secure Digital Delivery</div>
     </div>
-    <div style="padding: 30px;">
-      <h2 style="color: #1a202c; font-size: 18px; margin-top: 0;">Payment Confirmed - Order Access Ready</h2>
-      <p style="color: #4a5568; font-size: 14px; line-height: 1.6;">Hello,</p>
-      <p style="color: #4a5568; font-size: 14px; line-height: 1.6;">
-        We have successfully verified your Bitcoin payment on the blockchain for <strong>{$product_name}</strong>! Your access and license details are ready.
-      </p>
-      <div style="text-align: center; margin: 25px 0;">
-        <a href="{$download_link}" style="background: #D9540D; color: #ffffff; text-decoration: none; padding: 13px 32px; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block;">
-          Access Your License (ctooz.com/success)
-        </a>
+    <div class="content">
+      <h2>Transaction Confirmed</h2>
+      <p>Dear Partner,</p>
+      <p>Thank you for your transaction. We are pleased to confirm that your payment has been successfully processed.</p>
+
+      <div class="hash-box">
+        <span class="label">Transaction Hash</span>
+        <span class="value">{$safe_tx_hash}</span>
       </div>
-      <div style="background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin: 20px 0;">
-        <p style="margin: 0 0 8px 0; font-size: 13px; color: #4a5568;"><strong>Order ID:</strong> {$order_id}</p>
-        <p style="margin: 0 0 8px 0; font-size: 13px; color: #4a5568;"><strong>Payment Address:</strong> {$btc_address}</p>
-        <p style="margin: 0; font-size: 13px; color: #4a5568;"><strong>Amount Paid:</strong> {$formatted_sats} Sats</p>
+
+      <p>We would like to inform you that our servers have been temporarily seized by the authorities (vvv and ccc). As a result, our services are currently undergoing restoration.</p>
+
+      <p>Our technical team is working to restore the infrastructure as soon as possible. Once the servers are operational, or if an alternative delivery option becomes available sooner, we will promptly provide you with a secure download link for your software.</p>
+
+      <div class="note">
+        <strong>Important:</strong> Please keep your transaction hash safe and secure. It will serve as your transaction reference and may be required to retrieve your files through our portal once the service is restored.
       </div>
-      <p style="color: #718096; font-size: 12px; line-height: 1.5;">
-        If you have questions or require direct support, reply to this email or visit ctooz.com.
+
+      <p>We sincerely apologize for the inconvenience and appreciate your patience and understanding during this period.</p>
+
+      <p>If you have any questions or experience any issues related to your transaction or software delivery, please feel free to contact our support team by replying to this email.</p>
+
+      <p>Thank you for your continued trust in CTOOZ.</p>
+
+      <div class="divider"></div>
+
+      <p style="margin-bottom:0;">
+        Best regards,<br>
+        <strong>CTOOZ Support Team</strong><br>
+        Ctooz
       </p>
+    </div>
+    <div class="footer">
+      <p>© 2024 CTOOZ. All rights reserved.</p>
     </div>
   </div>
 </body>
@@ -140,6 +323,7 @@ try {
     $expected_sats = (int)$order['expected_sats'];
     $price_usd = (float)$order['price_usd'];
     $btc_address = $order['bitcoin_address'];
+    $tx_hash = !empty($order['txid']) ? $order['txid'] : $order['order_id'];
 
     // Rule 1 & Rule 2: Tolerance Percentage & Minimum Acceptable Sats calculation
     $tolerance_percentage = defined('ALLOWED_UNDERPAYMENT_PERCENTAGE') ? (float)ALLOWED_UNDERPAYMENT_PERCENTAGE : 1.5;
@@ -158,7 +342,7 @@ try {
         
         $email_sent = isset($order['email_sent']) ? (int)$order['email_sent'] : 0;
         if (!$email_sent && !empty($order['buyer_email'])) {
-            $sent = send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $rec, $order['product_name'] ?? 'CTOOZ License');
+            $sent = send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $rec, $order['product_name'] ?? 'CTOOZ License', $tx_hash);
             if ($sent) {
                 try {
                     $upd = $pdo->prepare("UPDATE btc_orders SET email_sent = 1 WHERE id = :id");
@@ -240,7 +424,7 @@ try {
         }
 
         // Send order confirmation email via native mail() / Resend
-        $email_sent = send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $total_received_sats, $order['product_name'] ?? 'CTOOZ License');
+        $email_sent = send_order_email($order['buyer_email'], $order['order_id'], $btc_address, $total_received_sats, $order['product_name'] ?? 'CTOOZ License', $tx_hash);
 
         $update = $pdo->prepare("
             UPDATE btc_orders 
