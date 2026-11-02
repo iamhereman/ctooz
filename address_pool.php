@@ -15,11 +15,23 @@ class AddressPoolManager {
         // Begin transaction to prevent race conditions
         $pdo->beginTransaction();
         try {
+            // Retire any addresses that have received partial payments to prevent reuse
+            try {
+                $pdo->exec("
+                    UPDATE btc_addresses_pool 
+                    SET status = 'used', updated_at = :now 
+                    WHERE status != 'used' 
+                      AND bitcoin_address IN (SELECT DISTINCT bitcoin_address FROM btc_orders WHERE received_sats > 0)
+                ");
+            } catch (Exception $e) {}
+
             // 1. Look for a reusable address: status is 'free' OR ('pending' and expired)
+            // CRITICAL BUG #6 FIX: An address that has ever received ANY satoshis must NEVER be reused!
             $stmt = $pdo->prepare("
                 SELECT id, bitcoin_address, derivation_index 
                 FROM btc_addresses_pool 
-                WHERE status = 'free' OR (status = 'pending' AND expires_at < :now)
+                WHERE (status = 'free' OR (status = 'pending' AND expires_at < :now))
+                  AND bitcoin_address NOT IN (SELECT DISTINCT bitcoin_address FROM btc_orders WHERE received_sats > 0)
                 ORDER BY derivation_index ASC 
                 LIMIT 1
             ");
