@@ -1,0 +1,8 @@
+name = "ctooz"
+compatibility_date = "2024-05-01"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ctooz-db"
+database_id = "local-d1"
